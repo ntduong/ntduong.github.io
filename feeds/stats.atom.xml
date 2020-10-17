@@ -1,81 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes - Stats</title><link href="/" rel="alternate"></link><link href="/feeds/stats.atom.xml" rel="self"></link><id>/</id><updated>2018-09-22T00:00:00+09:00</updated><entry><title>Estimating Distribution Mean and Quantiles</title><link href="/estimating-distribution-mean-and-quantiles.html" rel="alternate"></link><published>2018-09-22T00:00:00+09:00</published><updated>2018-09-22T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2018-09-22:/estimating-distribution-mean-and-quantiles.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
-&lt;p&gt;More concretely, consider a univariate continuous random variable $X$ following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) $p_X (x)$. Given a sample set ${x_i}&lt;em _tau="\tau"&gt;{i …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_ …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
-&lt;p&gt;More concretely, consider a univariate continuous random variable $X$ following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) $p_X (x)$. Given a sample set ${x_i}&lt;em _tau="\tau"&gt;{i=1}^n$ drawn i.i.d from the distribution, estimate:
-- The distribution mean (assume existence) $\mu = \mathbb{E}(X)$
-- The distribution quantiles (e.g., median), i.e., for a $\tau \in (0,1)$, roughly speaking the smallest value $q&lt;/em&gt;$ such that $\textrm{Prob}(X \leq q_\tau) = \tau$.&lt;/p&gt;
+&lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_{i=1}^n\)&lt;/span&gt; drawn i.i.d from the distribution, estimate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The distribution mean (assume existence) &lt;span class="math"&gt;\(\mu = \mathbb{E}(X)\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;The distribution quantiles (e.g., median), i.e., for a &lt;span class="math"&gt;\(\tau \in (0,1)\)&lt;/span&gt;, roughly speaking the smallest value &lt;span class="math"&gt;\(q_{\tau}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(\textrm{Prob}(X \leq q_\tau) = \tau\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: I've tried to keep all the math below valid yet as simple as possible. Feel free to correct me if you find anything horribly wrong.&lt;/p&gt;
 &lt;h2&gt;The mean&lt;/h2&gt;
-&lt;p&gt;For an arbitrary $m \in \mathbb{R}$, denote $\mathcal{L}(m) = \int (x-m)^2~p(x)~dx$.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Claim 1&lt;/strong&gt;: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}(m) = \mu$.&lt;/p&gt;
+&lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote &lt;span class="math"&gt;\(\mathcal{L}(m) = \int (x-m)^2~p(x)~dx\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Claim 1&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}(m) = \mu\)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Proof sketch&lt;/em&gt;:
-$$
-\begin{matrix}
-\underset{m}{\textrm{argmin}}~\mathcal{L}(m) &amp;amp;= &amp;amp; \underset{m}{\textrm{argmin}} \left [\int m^2~p(x)~dx - \int 2mx~p(x)~dx \right ] = \underset{m}{\textrm{argmin}} \left [m^2 - 2m\int x~p(x)~dx \right] \
-&amp;amp;= &amp;amp; \underset{m}{\textrm{argmin}}~\left (m - \int x~p(x)~dx\right )^2 = \int x~p(x)~dx = \mu
-\end{matrix}
-$$&lt;/p&gt;
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{array}{rcl}
+\underset{m}{\textrm{argmin}}~\mathcal{L}(m) &amp;amp;=&amp;amp;  \underset{m}{\textrm{argmin}} \left [\int m^2~p(x)~dx - \int 2mx~p(x)~dx \right ] \\
+&amp;amp;=&amp;amp; \underset{m}{\textrm{argmin}} \left [m^2 - 2m\int x~p(x)~dx \right] \\
+&amp;amp;=&amp;amp; \underset{m}{\textrm{argmin}}~\left (m - \int x~p(x)~dx\right )^2 = \int x~p(x)~dx = \mu
+\end{array}
+$$&lt;/div&gt;
 &lt;h3&gt;Sample estimate&lt;/h3&gt;
-&lt;p&gt;Since $p(x)$ is unknown, we instead minimize an approximate of the $\mathcal{L}(m)$ using the given sample, $$\hat{\mathcal{L}}(m) = \frac{1}{n} \sum_{i=1}^n (x_i - m)^2$$ and obtain an estimate of the mean:
-$$\hat{\mu} = \frac{1}{n} \sum_{i=1}^n~x_i =  \underset{m}{\textrm{argmin}}~\hat{\mathcal{L}}(m)$$&lt;/p&gt;
+&lt;p&gt;Since &lt;span class="math"&gt;\(p(x)\)&lt;/span&gt; is unknown, we instead minimize an approximate of the &lt;span class="math"&gt;\(\mathcal{L}(m)\)&lt;/span&gt; using the given sample, &lt;/p&gt;
+&lt;div class="math"&gt;$$\hat{\mathcal{L}}(m) = \frac{1}{n} \sum_{i=1}^n (x_i - m)^2$$&lt;/div&gt;
+&lt;p&gt; and obtain an estimate of the mean:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\hat{\mu} = \frac{1}{n} \sum_{i=1}^n~x_i =  \underset{m}{\textrm{argmin}}~\hat{\mathcal{L}}(m)$$&lt;/div&gt;
 &lt;h2&gt;The median&lt;/h2&gt;
-&lt;p&gt;Let $F(x)$ denote the cumulative distribution, i.e., $F(x) = \textrm{Prob}(X \leq x)$. &lt;/p&gt;
-&lt;p&gt;A median or $q_{0.5}$ is roughly the point which divides the distribution in half, i.e.,
-$$F(q_{0.5}) = 0.5$$&lt;/p&gt;
-&lt;p&gt;For an arbitrary $m \in \mathbb{R}$, denote $$\mathcal{L}_{0.5} (m) = \int |x-m|~p(x)~dx$$&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Claim 2&lt;/strong&gt;: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}&lt;em 0.5&gt;{0.5}(m) = q&lt;/em&gt;$. &lt;/p&gt;
-&lt;p&gt;See the next section for a proof sketch of a general case of any quantile $\tau \in (0,1)$.&lt;/p&gt;
+&lt;p&gt;Let &lt;span class="math"&gt;\(F(x)\)&lt;/span&gt; denote the cumulative distribution, i.e., &lt;span class="math"&gt;\(F(x) = \textrm{Prob}(X \leq x)\)&lt;/span&gt;. &lt;/p&gt;
+&lt;p&gt;A median or &lt;span class="math"&gt;\(q_{0.5}\)&lt;/span&gt; is roughly the point which divides the distribution in half, i.e.,
+&lt;/p&gt;
+&lt;div class="math"&gt;$$F(q_{0.5}) = 0.5$$&lt;/div&gt;
+&lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote &lt;/p&gt;
+&lt;div class="math"&gt;$$\mathcal{L}_{0.5} (m) = \int |x-m|~p(x)~dx$$&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Claim 2&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_{0.5}(m) = q_{0.5}\)&lt;/span&gt;. &lt;/p&gt;
+&lt;p&gt;See the next section for a proof sketch of a general case of any quantile &lt;span class="math"&gt;\(\tau \in (0,1)\)&lt;/span&gt;.&lt;/p&gt;
 &lt;h3&gt;Sample estimate&lt;/h3&gt;
 &lt;p&gt;Similar to the mean estimate, we can obtain an estimate of the median from the given sample,
-$$\hat{q}&lt;em i="1"&gt;{0.5} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum&lt;/em&gt;^n |x_i-m| = \textrm{median}({x_i}_{i=1}^n)$$&lt;/p&gt;
-&lt;h2&gt;The $\tau$-quantile&lt;/h2&gt;
-&lt;p&gt;For an arbitrary $m \in \mathbb{R}$, denote
-$$\mathcal{L}&lt;em _="&amp;lt;" m x&gt;{\tau}(m) = \int (x-m)(\tau - 1&lt;/em&gt;)~p(x)~dx$$
-where $ 1_{x &amp;lt; m} = \left{\begin{matrix}
-1 &amp;amp; \textrm{if}~x &amp;lt; m\ 
-0 &amp;amp; \textrm{otherwise}
-\end{matrix}\right.$&lt;/p&gt;
-&lt;p&gt;Note that $(x-m)(\tau - 1_{x &amp;lt; m})$ is nothing other than the &lt;strong&gt;quantile loss&lt;/strong&gt; often used in &lt;a href="https://en.wikipedia.org/wiki/Quantile_regression"&gt;quantile regression&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Claim 3&lt;/strong&gt;: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}&lt;em _tau="\tau"&gt;\tau (m) = q&lt;/em&gt;$&lt;/p&gt;
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\hat{q}_{0.5} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n |x_i-m| = \textrm{median}(\{x_i\}_{i=1}^n)$$&lt;/div&gt;
+&lt;h2&gt;The &lt;span class="math"&gt;\(\tau\)&lt;/span&gt;-quantile&lt;/h2&gt;
+&lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &amp;lt; m})~p(x)~dx$$&lt;/div&gt;
+&lt;p&gt;
+where &lt;/p&gt;
+&lt;div class="math"&gt;$$ 
+1_{x &amp;lt; m} = \left\{\begin{array}{ll}
+1 &amp;amp; \text{if}~x &amp;lt; m \\ 
+0 &amp;amp; \text{otherwise}
+\end{array}\right.
+$$&lt;/div&gt;
+&lt;p&gt;Note that &lt;span class="math"&gt;\((x-m)(\tau - 1_{x &amp;lt; m})\)&lt;/span&gt; is nothing other than the &lt;strong&gt;quantile loss&lt;/strong&gt; often used in &lt;a href="https://en.wikipedia.org/wiki/Quantile_regression"&gt;quantile regression&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Claim 3&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_\tau (m) = q_{\tau}\)&lt;/span&gt;&lt;/p&gt;
 &lt;h3&gt;Derivation of the quantile loss&lt;/h3&gt;
-&lt;p&gt;Curious readers may wonder how to come up with the above formula of $\mathcal{L}&lt;em&gt;{\tau}(m)$. Let me try to _reverse-engineer&lt;/em&gt; the quantile loss.&lt;/p&gt;
-&lt;p&gt;Given arbitrary $0 &amp;lt; c_1, c_2 \in \mathbb{R}$, consider a generalized form of the median loss $\mathcal{L}&lt;em c_1_="c_1," c_2&gt;{0.5}$, 
-$$\mathcal{L}&lt;/em&gt;(m) = c_1 \underset{x \geq m}{\int} (x-m)~p(x)~dx + c_2 \underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$
-Intuitively, we assign different &lt;em&gt;costs&lt;/em&gt; to $x$ depending on its value relative to $m$. The problem is for a given $\tau \in (0,1)$ find $c_1, c_2$ such that
-$$\underset{m}{\textrm{argmin}}~\mathcal{L}&lt;em&gt;{c_1, c_2}(m) = q&lt;/em&gt;\tau$$&lt;/p&gt;
-&lt;p&gt;Take a variable change $u=F(x)$ then $du = dF(x) = p(x)~dx$ and $F(m) = v$ for some $v \in [0,1]$. Also, $x = F^{-1}(u)$. Note that &lt;strong&gt;we slightly abuse the notation here using $\mathcal{L}_{c_1, c_2}(v)$ as the loss after the variable change to avoid introducing new notation.&lt;/strong&gt;
-$$
-\begin{matrix}
-\mathcal{L}_{c_1, c_2}(v) &amp;amp; = &amp;amp; c_1\int_v^1(F^{-1}(u)-F^{-1}(v))~du + c_2\int_0^v(F^{-1}(v)-F^{-1}(u))~du \
-&amp;amp; = &amp;amp; c_1\int_v^1 F^{-1}(u)~du - c_1 F^{-1}(v) (1-v) + c_2 F^{-1}(v) v - c_2\int_0^v F^{-1}(u)~du
-\end{matrix}
-$$&lt;/p&gt;
+&lt;p&gt;Curious readers may wonder how to come up with the above formula of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;. Let me try to &lt;em&gt;reverse-engineer&lt;/em&gt; the quantile loss.&lt;/p&gt;
+&lt;p&gt;Given arbitrary &lt;span class="math"&gt;\(0 &amp;lt; c_1, c_2 \in \mathbb{R}\)&lt;/span&gt;, consider a generalized form of the median loss &lt;span class="math"&gt;\(\mathcal{L}_{0.5}\)&lt;/span&gt;, 
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathcal{L}_{c_1, c_2}(m) = c_1 \underset{x \geq m}{\int} (x-m)~p(x)~dx + c_2 \underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$&lt;/div&gt;
+&lt;p&gt;
+Intuitively, we assign different &lt;em&gt;costs&lt;/em&gt; to &lt;span class="math"&gt;\(x\)&lt;/span&gt; depending on its value relative to &lt;span class="math"&gt;\(m\)&lt;/span&gt;. The problem is for a given &lt;span class="math"&gt;\(\tau \in (0,1)\)&lt;/span&gt; find &lt;span class="math"&gt;\(c_1, c_2\)&lt;/span&gt; such that
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\underset{m}{\textrm{argmin}}~\mathcal{L}_{c_1, c_2}(m) = q_\tau$$&lt;/div&gt;
+&lt;p&gt;Take a variable change &lt;span class="math"&gt;\(u=F(x)\)&lt;/span&gt; then &lt;span class="math"&gt;\(du = dF(x) = p(x)~dx\)&lt;/span&gt; and &lt;span class="math"&gt;\(F(m) = v\)&lt;/span&gt; for some &lt;span class="math"&gt;\(v \in [0,1]\)&lt;/span&gt;. Also, &lt;span class="math"&gt;\(x = F^{-1}(u)\)&lt;/span&gt;. Note that &lt;strong&gt;we slightly abuse the notation here using &lt;span class="math"&gt;\(\mathcal{L}_{c_1, c_2}(v)\)&lt;/span&gt; as the loss after the variable change to avoid introducing new notation.&lt;/strong&gt;
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{array}{lcl}
+\mathcal{L}_{c_1, c_2}(v) &amp;amp;=&amp;amp; c_1\int_v^1(F^{-1}(u)-F^{-1}(v))~du + c_2\int_0^v(F^{-1}(v)-F^{-1}(u))~du \\
+&amp;amp;=&amp;amp; c_1\int_v^1 F^{-1}(u)~du - c_1 F^{-1}(v) (1-v) + c_2 F^{-1}(v) v - c_2\int_0^v F^{-1}(u)~du
+\end{array}
+$$&lt;/div&gt;
 &lt;p&gt;From the &lt;a href="https://en.wikipedia.org/wiki/Leibniz_integral_rule"&gt;Leibniz integral rule&lt;/a&gt; and the &lt;a href="https://en.wikipedia.org/wiki/Product_rule"&gt;product rule&lt;/a&gt;,&lt;/p&gt;
-&lt;p&gt;$$
-\begin{matrix}
-\frac{d}{dv}\mathcal{L}_{c_1, c_2}(v) &amp;amp; = &amp;amp; -c_1 F^{-1}(v) + c_1 F^{-1}(v) - c_1 (1-v)\frac{d}{dv}F^{-1}(v) \ &amp;amp; + &amp;amp; c_2 F^{-1}(v) + c_2 v\frac{d}{dv}F^{-1}(v) - c_2 F^{-1}(v) \
+&lt;div class="math"&gt;$$
+\begin{array}{lcl}
+\frac{d}{dv}\mathcal{L}_{c_1, c_2}(v) &amp;amp; = &amp;amp; -c_1 F^{-1}(v) + c_1 F^{-1}(v) - c_1 (1-v)\frac{d}{dv}F^{-1}(v) \\ &amp;amp; &amp;amp; +~c_2 F^{-1}(v) + c_2 v\frac{d}{dv}F^{-1}(v) - c_2 F^{-1}(v) \\
 &amp;amp; = &amp;amp; \frac{d}{dv}F^{-1}(v) (-c_1 + c_1 v + c_2 v)~~(*)
-\end{matrix}
-$$ &lt;/p&gt;
-&lt;p&gt;For $q_\tau$ to be the minimizer of $\mathcal{L}&lt;em c_1_="c_1," c_2&gt;{c_1, c_2}(m)$, or equivalently, $\tau$ is the minimizer of $\mathcal{L}&lt;/em&gt;(v)$,
-$$\frac{d}{dv}\mathcal{L}&lt;em _mid="\mid" v="\tau"&gt;{c_1, c_2}(v)&lt;/em&gt; = 0,$$ 
-and since $\frac{d}{dv}F^{-1}(v) \neq 0$ in general, this essentially implies $$c_1 \tau + c_2 \tau - c_1 = 0$$&lt;/p&gt;
-&lt;p&gt;Note that the loss minimizer doesn't change if we scale $c_1, c_2$ with the same rate, so without the loss of generality, we can set $c_1 = 1$. Thus solving for $c_2$, we obtain $c_2 = \frac{1-\tau}{\tau}$. Substitute $c_1 = 1, c_2 = \frac{1-\tau}{\tau}$ into the original loss:
-$$\mathcal{L}&lt;em c_1_="c_1," c_2&gt;{c_1, c_2}(m) = \underset{x \geq m}{\int} (x-m)~p(x)~dx + \frac{1-\tau}{\tau}\underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$
-Since $\tau &amp;gt; 0$, minimizing $\mathcal{L}&lt;/em&gt;(m)$ is equivalent to minimizing the following:
-$$\tau\underset{x \geq m}{\int} (x-m)~p(x)~dx + (1-\tau)\underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$
-which is the same as $$\mathcal{L}&lt;em _="&amp;lt;" m x&gt;{\tau}(m) = \int (x-m)(\tau - 1&lt;/em&gt;)~p(x)~dx$$&lt;/p&gt;
-&lt;h3&gt;Why $q_\tau$ is the minimizer of $\mathcal{L}_{\tau}(m)$?&lt;/h3&gt;
-&lt;p&gt;As shown above, $\tau$ is a critical point of $\mathcal{L}&lt;em _tau="\tau"&gt;{\tau}(v)$,
-$$\frac{d}{dv}\mathcal{L}&lt;/em&gt;(v)_{\mid v=\tau} = 0$$&lt;/p&gt;
-&lt;p&gt;From $(*)$ with $c_1 = \tau, c_2 = 1 - \tau$, we have $\frac{d}{dv}\mathcal{L}&lt;em _tau="\tau"&gt;{\tau}(v) =   \frac{d}{dv}F^{-1}(v) (v - \tau)$. Since $F^{-1}$ is a non-decreasing function, i.e., for any $0 \leq v_1 \leq v_2 \leq 1$, $F^{-1}(v_1) \leq F^{-1}(v_2)$; so $\frac{d}{dv}F^{-1}(v) &amp;gt; 0$. Thus, $\frac{d}{dv}\mathcal{L}&lt;/em&gt;(v)$ has the same sign as $v - \tau$:&lt;/p&gt;
+\end{array}
+$$&lt;/div&gt;
+&lt;p&gt;For &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; to be the minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{c_1, c_2}(m)\)&lt;/span&gt;, or equivalently, &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is the minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{c_1, c_2}(v)\)&lt;/span&gt;,
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\frac{d}{dv}\mathcal{L}_{c_1, c_2}(v)_{\mid v=\tau} = 0,$$&lt;/div&gt;
+&lt;p&gt; 
+and since &lt;span class="math"&gt;\(\frac{d}{dv}F^{-1}(v) \neq 0\)&lt;/span&gt; in general, this essentially implies &lt;/p&gt;
+&lt;div class="math"&gt;$$c_1 \tau + c_2 \tau - c_1 = 0$$&lt;/div&gt;
+&lt;p&gt;Note that the loss minimizer doesn't change if we scale &lt;span class="math"&gt;\(c_1, c_2\)&lt;/span&gt; with the same rate, so without the loss of generality, we can set &lt;span class="math"&gt;\(c_1 = 1\)&lt;/span&gt;. Thus solving for &lt;span class="math"&gt;\(c_2\)&lt;/span&gt;, we obtain &lt;span class="math"&gt;\(c_2 = \frac{1-\tau}{\tau}\)&lt;/span&gt;. Substitute &lt;span class="math"&gt;\(c_1 = 1, c_2 = \frac{1-\tau}{\tau}\)&lt;/span&gt; into the original loss:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathcal{L}_{c_1, c_2}(m) = \underset{x \geq m}{\int} (x-m)~p(x)~dx + \frac{1-\tau}{\tau}\underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$&lt;/div&gt;
+&lt;p&gt;
+Since &lt;span class="math"&gt;\(\tau &amp;gt; 0\)&lt;/span&gt;, minimizing &lt;span class="math"&gt;\(\mathcal{L}_{c_1, c_2}(m)\)&lt;/span&gt; is equivalent to minimizing the following:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\tau\underset{x \geq m}{\int} (x-m)~p(x)~dx + (1-\tau)\underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$&lt;/div&gt;
+&lt;p&gt;
+which is the same as &lt;/p&gt;
+&lt;div class="math"&gt;$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &amp;lt; m})~p(x)~dx$$&lt;/div&gt;
+&lt;h3&gt;Why &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is the minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;?&lt;/h3&gt;
+&lt;p&gt;As shown above, &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is a critical point of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v)\)&lt;/span&gt;,
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\frac{d}{dv}\mathcal{L}_{\tau}(v)_{\mid v=\tau} = 0$$&lt;/div&gt;
+&lt;p&gt;From &lt;span class="math"&gt;\((*)\)&lt;/span&gt; with &lt;span class="math"&gt;\(c_1 = \tau, c_2 = 1 - \tau\)&lt;/span&gt;, we have &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v) =   \frac{d}{dv}F^{-1}(v) (v - \tau)\)&lt;/span&gt;. Since &lt;span class="math"&gt;\(F^{-1}\)&lt;/span&gt; is a non-decreasing function, i.e., for any &lt;span class="math"&gt;\(0 \leq v_1 \leq v_2 \leq 1\)&lt;/span&gt;, &lt;span class="math"&gt;\(F^{-1}(v_1) \leq F^{-1}(v_2)\)&lt;/span&gt;; so &lt;span class="math"&gt;\(\frac{d}{dv}F^{-1}(v) &amp;gt; 0\)&lt;/span&gt;. Thus, &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v)\)&lt;/span&gt; has the same sign as &lt;span class="math"&gt;\(v - \tau\)&lt;/span&gt;:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;For any $v \geq \tau$, $\frac{d}{dv}\mathcal{L}&lt;em _tau="\tau"&gt;{\tau}(v) \geq 0$; hence $\mathcal{L}&lt;/em&gt;(v) \geq \mathcal{L}_{\tau}(\tau)$. &lt;/li&gt;
-&lt;li&gt;For any $v \leq \tau$, $\frac{d}{dv}\mathcal{L}&lt;em _tau="\tau"&gt;{\tau}(v) \leq 0$; hence $\mathcal{L}&lt;/em&gt;(v) \geq \mathcal{L}_{\tau}(\tau)$.&lt;/li&gt;
+&lt;li&gt;For any &lt;span class="math"&gt;\(v \geq \tau\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \geq 0\)&lt;/span&gt;; hence &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;. &lt;/li&gt;
+&lt;li&gt;For any &lt;span class="math"&gt;\(v \leq \tau\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \leq 0\)&lt;/span&gt;; hence &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;For any $v \in [0,1]$, $\mathcal{L}&lt;em _tau="\tau"&gt;{\tau}(v) \geq \mathcal{L}&lt;/em&gt;(\tau)$. Thus $\tau$ is a minimizer of $\mathcal{L}&lt;em&gt;{\tau}(v)$, or equivalently $q&lt;/em&gt;\tau$ is a minimizer of $\mathcal{L}_{\tau}(m)$. &lt;/p&gt;
+&lt;p&gt;For any &lt;span class="math"&gt;\(v \in [0,1]\)&lt;/span&gt;, &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;. Thus &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v)\)&lt;/span&gt;, or equivalently &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;. &lt;/p&gt;
 &lt;h3&gt;Sample estimate&lt;/h3&gt;
 &lt;p&gt;Finally, we can obtain an estimate of the quantile as:&lt;/p&gt;
-&lt;p&gt;$$\hat{q}&lt;em i="1"&gt;{\tau} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum&lt;/em&gt;^n (x_i-m)(\tau - 1_{x_i &amp;lt; m})$$&lt;/p&gt;</content><category term="Stats"></category><category term="distribution"></category><category term="mean"></category><category term="median"></category><category term="quantile"></category><category term="estimate"></category></entry></feed>
+&lt;div class="math"&gt;$$\hat{q}_{\tau} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n (x_i-m)(\tau - 1_{x_i &amp;lt; m})$$&lt;/div&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Stats"></category><category term="distribution"></category><category term="mean"></category><category term="median"></category><category term="quantile"></category><category term="estimate"></category></entry></feed>
