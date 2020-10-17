@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>Random Notes - Estimating Distribution Mean and Quantiles</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
+        <link href="/feeds/stats.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="distribution" />
+    <meta name="tags" content="mean" />
+    <meta name="tags" content="median" />
+    <meta name="tags" content="quantile" />
+    <meta name="tags" content="estimate" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Random Notes</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about-me.html">About me</a></li>
+            <li class="active"><a href="/category/stats.html">Stats</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="/estimating-distribution-mean-and-quantiles.html" rel="bookmark"
+         title="Permalink to Estimating Distribution Mean and Quantiles">Estimating Distribution Mean and Quantiles</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <time class="published" datetime="2018-09-22T00:00:00+09:00">
+      Sat 22 September 2018
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+    </address>
+    <div class="category">
+        Category: <a href="/category/stats.html">Stats</a>
+    </div>
+    <div class="tags">
+        Tags:
+            <a href="/tag/distribution.html">distribution</a>
+            <a href="/tag/mean.html">mean</a>
+            <a href="/tag/median.html">median</a>
+            <a href="/tag/quantile.html">quantile</a>
+            <a href="/tag/estimate.html">estimate</a>
+    </div>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <h2>Introduction</h2>
+<p>In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. </p>
+<p>More concretely, consider a univariate continuous random variable $X$ following an <strong>unknown</strong> distribution with <em>probability density function</em> (pdf) $p_X (x)$. Given a sample set ${x_i}<em _tau="\tau">{i=1}^n$ drawn i.i.d from the distribution, estimate:
+- The distribution mean (assume existence) $\mu = \mathbb{E}(X)$
+- The distribution quantiles (e.g., median), i.e., for a $\tau \in (0,1)$, roughly speaking the smallest value $q</em>$ such that $\textrm{Prob}(X \leq q_\tau) = \tau$.</p>
+<p><strong>Disclaimer</strong>: I've tried to keep all the math below valid yet as simple as possible. Feel free to correct me if you find anything horribly wrong.</p>
+<h2>The mean</h2>
+<p>For an arbitrary $m \in \mathbb{R}$, denote $\mathcal{L}(m) = \int (x-m)^2~p(x)~dx$.</p>
+<p><strong>Claim 1</strong>: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}(m) = \mu$.</p>
+<p><em>Proof sketch</em>:
+$$
+\begin{matrix}
+\underset{m}{\textrm{argmin}}~\mathcal{L}(m) &amp;= &amp; \underset{m}{\textrm{argmin}} \left [\int m^2~p(x)~dx - \int 2mx~p(x)~dx \right ] = \underset{m}{\textrm{argmin}} \left [m^2 - 2m\int x~p(x)~dx \right] \
+&amp;= &amp; \underset{m}{\textrm{argmin}}~\left (m - \int x~p(x)~dx\right )^2 = \int x~p(x)~dx = \mu
+\end{matrix}
+$$</p>
+<h3>Sample estimate</h3>
+<p>Since $p(x)$ is unknown, we instead minimize an approximate of the $\mathcal{L}(m)$ using the given sample, $$\hat{\mathcal{L}}(m) = \frac{1}{n} \sum_{i=1}^n (x_i - m)^2$$ and obtain an estimate of the mean:
+$$\hat{\mu} = \frac{1}{n} \sum_{i=1}^n~x_i =  \underset{m}{\textrm{argmin}}~\hat{\mathcal{L}}(m)$$</p>
+<h2>The median</h2>
+<p>Let $F(x)$ denote the cumulative distribution, i.e., $F(x) = \textrm{Prob}(X \leq x)$. </p>
+<p>A median or $q_{0.5}$ is roughly the point which divides the distribution in half, i.e.,
+$$F(q_{0.5}) = 0.5$$</p>
+<p>For an arbitrary $m \in \mathbb{R}$, denote $$\mathcal{L}_{0.5} (m) = \int |x-m|~p(x)~dx$$</p>
+<p><strong>Claim 2</strong>: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}<em 0.5>{0.5}(m) = q</em>$. </p>
+<p>See the next section for a proof sketch of a general case of any quantile $\tau \in (0,1)$.</p>
+<h3>Sample estimate</h3>
+<p>Similar to the mean estimate, we can obtain an estimate of the median from the given sample,
+$$\hat{q}<em i="1">{0.5} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum</em>^n |x_i-m| = \textrm{median}({x_i}_{i=1}^n)$$</p>
+<h2>The $\tau$-quantile</h2>
+<p>For an arbitrary $m \in \mathbb{R}$, denote
+$$\mathcal{L}<em _="&lt;" m x>{\tau}(m) = \int (x-m)(\tau - 1</em>)~p(x)~dx$$
+where $ 1_{x &lt; m} = \left{\begin{matrix}
+1 &amp; \textrm{if}~x &lt; m\ 
+0 &amp; \textrm{otherwise}
+\end{matrix}\right.$</p>
+<p>Note that $(x-m)(\tau - 1_{x &lt; m})$ is nothing other than the <strong>quantile loss</strong> often used in <a href="https://en.wikipedia.org/wiki/Quantile_regression">quantile regression</a>.</p>
+<p><strong>Claim 3</strong>: $m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}<em _tau="\tau">\tau (m) = q</em>$</p>
+<h3>Derivation of the quantile loss</h3>
+<p>Curious readers may wonder how to come up with the above formula of $\mathcal{L}<em>{\tau}(m)$. Let me try to _reverse-engineer</em> the quantile loss.</p>
+<p>Given arbitrary $0 &lt; c_1, c_2 \in \mathbb{R}$, consider a generalized form of the median loss $\mathcal{L}<em c_1_="c_1," c_2>{0.5}$, 
+$$\mathcal{L}</em>(m) = c_1 \underset{x \geq m}{\int} (x-m)~p(x)~dx + c_2 \underset{x &lt; m}{\int} (m-x)~p(x)~dx$$
+Intuitively, we assign different <em>costs</em> to $x$ depending on its value relative to $m$. The problem is for a given $\tau \in (0,1)$ find $c_1, c_2$ such that
+$$\underset{m}{\textrm{argmin}}~\mathcal{L}<em>{c_1, c_2}(m) = q</em>\tau$$</p>
+<p>Take a variable change $u=F(x)$ then $du = dF(x) = p(x)~dx$ and $F(m) = v$ for some $v \in [0,1]$. Also, $x = F^{-1}(u)$. Note that <strong>we slightly abuse the notation here using $\mathcal{L}_{c_1, c_2}(v)$ as the loss after the variable change to avoid introducing new notation.</strong>
+$$
+\begin{matrix}
+\mathcal{L}_{c_1, c_2}(v) &amp; = &amp; c_1\int_v^1(F^{-1}(u)-F^{-1}(v))~du + c_2\int_0^v(F^{-1}(v)-F^{-1}(u))~du \
+&amp; = &amp; c_1\int_v^1 F^{-1}(u)~du - c_1 F^{-1}(v) (1-v) + c_2 F^{-1}(v) v - c_2\int_0^v F^{-1}(u)~du
+\end{matrix}
+$$</p>
+<p>From the <a href="https://en.wikipedia.org/wiki/Leibniz_integral_rule">Leibniz integral rule</a> and the <a href="https://en.wikipedia.org/wiki/Product_rule">product rule</a>,</p>
+<p>$$
+\begin{matrix}
+\frac{d}{dv}\mathcal{L}_{c_1, c_2}(v) &amp; = &amp; -c_1 F^{-1}(v) + c_1 F^{-1}(v) - c_1 (1-v)\frac{d}{dv}F^{-1}(v) \ &amp; + &amp; c_2 F^{-1}(v) + c_2 v\frac{d}{dv}F^{-1}(v) - c_2 F^{-1}(v) \
+&amp; = &amp; \frac{d}{dv}F^{-1}(v) (-c_1 + c_1 v + c_2 v)~~(*)
+\end{matrix}
+$$ </p>
+<p>For $q_\tau$ to be the minimizer of $\mathcal{L}<em c_1_="c_1," c_2>{c_1, c_2}(m)$, or equivalently, $\tau$ is the minimizer of $\mathcal{L}</em>(v)$,
+$$\frac{d}{dv}\mathcal{L}<em _mid="\mid" v="\tau">{c_1, c_2}(v)</em> = 0,$$ 
+and since $\frac{d}{dv}F^{-1}(v) \neq 0$ in general, this essentially implies $$c_1 \tau + c_2 \tau - c_1 = 0$$</p>
+<p>Note that the loss minimizer doesn't change if we scale $c_1, c_2$ with the same rate, so without the loss of generality, we can set $c_1 = 1$. Thus solving for $c_2$, we obtain $c_2 = \frac{1-\tau}{\tau}$. Substitute $c_1 = 1, c_2 = \frac{1-\tau}{\tau}$ into the original loss:
+$$\mathcal{L}<em c_1_="c_1," c_2>{c_1, c_2}(m) = \underset{x \geq m}{\int} (x-m)~p(x)~dx + \frac{1-\tau}{\tau}\underset{x &lt; m}{\int} (m-x)~p(x)~dx$$
+Since $\tau &gt; 0$, minimizing $\mathcal{L}</em>(m)$ is equivalent to minimizing the following:
+$$\tau\underset{x \geq m}{\int} (x-m)~p(x)~dx + (1-\tau)\underset{x &lt; m}{\int} (m-x)~p(x)~dx$$
+which is the same as $$\mathcal{L}<em _="&lt;" m x>{\tau}(m) = \int (x-m)(\tau - 1</em>)~p(x)~dx$$</p>
+<h3>Why $q_\tau$ is the minimizer of $\mathcal{L}_{\tau}(m)$?</h3>
+<p>As shown above, $\tau$ is a critical point of $\mathcal{L}<em _tau="\tau">{\tau}(v)$,
+$$\frac{d}{dv}\mathcal{L}</em>(v)_{\mid v=\tau} = 0$$</p>
+<p>From $(*)$ with $c_1 = \tau, c_2 = 1 - \tau$, we have $\frac{d}{dv}\mathcal{L}<em _tau="\tau">{\tau}(v) =   \frac{d}{dv}F^{-1}(v) (v - \tau)$. Since $F^{-1}$ is a non-decreasing function, i.e., for any $0 \leq v_1 \leq v_2 \leq 1$, $F^{-1}(v_1) \leq F^{-1}(v_2)$; so $\frac{d}{dv}F^{-1}(v) &gt; 0$. Thus, $\frac{d}{dv}\mathcal{L}</em>(v)$ has the same sign as $v - \tau$:</p>
+<ul>
+<li>For any $v \geq \tau$, $\frac{d}{dv}\mathcal{L}<em _tau="\tau">{\tau}(v) \geq 0$; hence $\mathcal{L}</em>(v) \geq \mathcal{L}_{\tau}(\tau)$. </li>
+<li>For any $v \leq \tau$, $\frac{d}{dv}\mathcal{L}<em _tau="\tau">{\tau}(v) \leq 0$; hence $\mathcal{L}</em>(v) \geq \mathcal{L}_{\tau}(\tau)$.</li>
+</ul>
+<p>For any $v \in [0,1]$, $\mathcal{L}<em _tau="\tau">{\tau}(v) \geq \mathcal{L}</em>(\tau)$. Thus $\tau$ is a minimizer of $\mathcal{L}<em>{\tau}(v)$, or equivalently $q</em>\tau$ is a minimizer of $\mathcal{L}_{\tau}(m)$. </p>
+<h3>Sample estimate</h3>
+<p>Finally, we can obtain an estimate of the quantile as:</p>
+<p>$$\hat{q}<em i="1">{\tau} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum</em>^n (x_i-m)(\tau - 1_{x_i &lt; m})$$</p>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>
