@@ -101,7 +101,7 @@ Hence, &lt;span class="math"&gt;\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]
 &lt;li&gt;&lt;span class="math"&gt;\(R_3 = (2..3]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_4 = (0..4]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_8 = (0..8]\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \subset R_{i+\text{lsb}(i)}\)&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Proof:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)&lt;/span&gt;&lt;/li&gt;
