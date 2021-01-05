@@ -1,5 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes - Duong Nguyen</title><link href="/" rel="alternate"></link><link href="/feeds/duong-nguyen.atom.xml" rel="self"></link><id>/</id><updated>2018-09-22T00:00:00+09:00</updated><entry><title>Estimating Distribution Mean and Quantiles</title><link href="/estimating-distribution-mean-and-quantiles.html" rel="alternate"></link><published>2018-09-22T00:00:00+09:00</published><updated>2018-09-22T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2018-09-22:/estimating-distribution-mean-and-quantiles.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes - Duong Nguyen</title><link href="/" rel="alternate"></link><link href="/feeds/duong-nguyen.atom.xml" rel="self"></link><id>/</id><updated>2021-01-05T00:00:00+09:00</updated><entry><title>Binary Indexed Tree (Part 1)</title><link href="/binary-indexed-tree-part-1.html" rel="alternate"></link><published>2021-01-05T00:00:00+09:00</published><updated>2021-01-05T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-05:/binary-indexed-tree-part-1.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a …&lt;/p&gt;</summary><content type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a different/new perspective on the data structure, complementing many existing (good) tutorials that I've seen. In particular, in this two-part series,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Part 1: Distill its core ideas with intuitive explanation provided when needed. If you're already familiar with the standard range-query/point-update BIT, feel free to skip this part.&lt;/li&gt;
+&lt;li&gt;Part 2: Building on the core ideas from Part 1, suggest some flexible (and probably lesser-known) ways to extend the data structure to support more usecases, such as range-update/range-query and high-dimensional range queries.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Last but not least, BIT is one of my all-time favorite data structure, and the underlying ideas are beautiful so I decided to write about it for my future self!&lt;/p&gt;
+&lt;h2 id="what-is-bit-anyway"&gt;What is BIT anyway?&lt;/h2&gt;
+&lt;p&gt;In short, BIT is a data structure, supporting efficient range queries on &lt;strong&gt;dynamic&lt;/strong&gt; arrays, i.e., the array content can be updated along the way. More concretely, a standard BIT supports the following operations on an sized-&lt;span class="math"&gt;\(n\)&lt;/span&gt; array &lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt; in &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; time per op, with additional &lt;span class="math"&gt;\(O(n)\)&lt;/span&gt; space (for internal structure):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Prefix range query: &lt;span class="math"&gt;\(f(a[1..m])\)&lt;/span&gt;, e.g., sum of the first &lt;span class="math"&gt;\(m\)&lt;/span&gt; elements&lt;/li&gt;
+&lt;li&gt;Point update: &lt;span class="math"&gt;\(u(a[i], v)\)&lt;/span&gt;, e.g., increasing &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; by &lt;span class="math"&gt;\(v\)&lt;/span&gt;, &lt;span class="math"&gt;\(a[i] \leftarrow a[i] + v\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are ways to enable (range update, point query) and (range update, range query) and they are all built on the key ideas that we're going to touch on later and in the next part.&lt;/p&gt;
+&lt;p&gt;Despite its name and many existing tutorials describe it as a tree, I prefer to see BIT as a clever &lt;strong&gt;decomposition of the array&lt;/strong&gt; for efficient queries and updates. More about this will be discussed below.&lt;/p&gt;
+&lt;p&gt;Honorable mentions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A more complex and powerful data structure which also support similar operations on dynamic arrays among other things is &lt;a href="https://cp-algorithms.com/data_structures/segment_tree.html"&gt;segment tree&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;For range queries on &lt;strong&gt;static&lt;/strong&gt; arrays (no change to content), simpler data structures such as &lt;a href="https://cp-algorithms.com/data_structures/sparse-table.html"&gt;Sparse table&lt;/a&gt; (e.g., for range minimum query tasks), block decomposition techniques (e.g., &lt;a href="https://cp-algorithms.com/data_structures/sqrt_decomposition.html"&gt;square root decomposition&lt;/a&gt;), or even a simple prefix sum array would be enough.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I'll write about these range-queries data structures in a future posts about beautiful and practical data structures (IMHO). So stay tuned!&lt;/p&gt;
+&lt;h3 id="why-does-it-matter"&gt;Why does it matter?&lt;/h3&gt;
+&lt;p&gt;Hang on, for the prefix range query and point update operations above, wouldn't the straightforward &lt;span class="math"&gt;\(O(1)\)&lt;/span&gt; update, &lt;span class="math"&gt;\(O(n)\)&lt;/span&gt; query on the array be enough? Why bother with BIT? Well, it depends, e.g.,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;span class="math"&gt;\(O(1)\)&lt;/span&gt; update, &lt;span class="math"&gt;\(O(n)\)&lt;/span&gt; query approach is reasonable when most operations are update and very few are range query&lt;/li&gt;
+&lt;li&gt;When the input size is large with many range queries then &lt;span class="math"&gt;\(O(n)\)&lt;/span&gt; query isn't ideal and &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; query at the expense of &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; update seems better&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Cliché: There is no single best solution for all usecases.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="key-ideas"&gt;Key Ideas&lt;/h1&gt;
+&lt;h2 id="range-decomposition"&gt;Range decomposition&lt;/h2&gt;
+&lt;p&gt;For range query, without any preprocessing, the best we can do is to iterate over the whole range, which is essentially &lt;span class="math"&gt;\(O(n)\)&lt;/span&gt;. A natural idea is then to split the range into sub-ranges (smaller contiguous blocks) and "precompute" the queries on these blocks. To answer the query on the original range, we can just combine the precomputed answers on smaller sub-ranges.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key point is to devise efficient split and combine scheme.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Observation 1&lt;/strong&gt;: BIT splits a prefix range based on binary expansion.
+Given a range &lt;span class="math"&gt;\(R = [1..m] = (0..m]\)&lt;/span&gt;, consider binary representation of &lt;span class="math"&gt;\(m = 2^{k_1} + 2^{k_2} + ... + 2^{k_t}\)&lt;/span&gt;, where &lt;span class="math"&gt;\(0 \leq k_1 \leq ... \leq k_t\)&lt;/span&gt;. Thus, 
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+L = (0..2^{k_1}] \cup (2^{k_1}..(2^{k_1} + 2^{k_2})] \cup ...((2^{k_1}+...+2^{k_{t-1}})..m]
+$$&lt;/div&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Clearly, all the subranges are disjoint and together (when union) they cover the whole original range.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;How do we quickly &lt;em&gt;traverse&lt;/em&gt; all these subranges?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Start with &lt;span class="math"&gt;\(m\)&lt;/span&gt; and remove the 1s to the right once at a time, starting from the least significant bit!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Example: &lt;span class="math"&gt;\(m = 7 = 2^2+2^1+2^0 = 111_{2}\)&lt;/span&gt;,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;remove the lsb: &lt;span class="math"&gt;\(7 (111) \rightarrow 6 (110)\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;remove the next 1: &lt;span class="math"&gt;\(6 (110) \rightarrow 4(100)\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;remove the last 1: &lt;span class="math"&gt;\(4(100) \rightarrow 0(000)\)&lt;/span&gt;
+Hence, &lt;span class="math"&gt;\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The number of sub-ranges is the number of times the 1s are removed until we reach 0; which is the number of 1s in the binary representation of &lt;span class="math"&gt;\(m\)&lt;/span&gt;, which is at most &lt;span class="math"&gt;\(k_t \leq \log m\)&lt;/span&gt; (as &lt;span class="math"&gt;\(2^{k_t} \leq m\)&lt;/span&gt;).&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;We can efficiently traverse and combine all the subranges of &lt;span class="math"&gt;\([1..n]\)&lt;/span&gt; in &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; time.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="remark"&gt;Remark&lt;/h3&gt;
+&lt;p&gt;This &lt;strong&gt;binary expansion&lt;/strong&gt; (also known as &lt;strong&gt;binary lifting&lt;/strong&gt;) idea is so beautiful and I see it in many places (no surprise), such as RMQ (sparse table construction and non-idempotent query), finding lowest common ancestor (LCA), finding &lt;span class="math"&gt;\(k\)&lt;/span&gt;-node-away ancestor of a tree node, etc. For arrays of non-negatives (all prefix sums are non-decreasing), we can use this technique with BIT to find the prefix sum of a specific value in &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; time, same as binary search but no need for the array being sorted! I won't digress here and the binary lifting idea deserves its own post, for now see e.g., &lt;a href="https://codeforces.com/blog/entry/61364"&gt;this post&lt;/a&gt; if you're interested.&lt;/p&gt;
+&lt;h3 id="implementation-details"&gt;Implementation details&lt;/h3&gt;
+&lt;p&gt;Given a range &lt;span class="math"&gt;\((1..n]\)&lt;/span&gt;, it's fairly easy to implement the range query by iteratively extract and remove the least significant bit from &lt;span class="math"&gt;\(n\)&lt;/span&gt;. Recall modern computer system uses the &lt;a href="https://en.wikipedia.org/wiki/Two%27s_complement"&gt;two's conplement&lt;/a&gt; representation for integers, it's easy to see &lt;span class="math"&gt;\(2^{\text{lsb}(n)} = n \&amp;amp; (-n)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Let &lt;span class="math"&gt;\(tree[i]\)&lt;/span&gt; denote the query value computed on the range &lt;span class="math"&gt;\((i-(i\&amp;amp;-i)..i]\)&lt;/span&gt; (we'll get to how to update these &lt;span class="math"&gt;\(tree[1..n]\)&lt;/span&gt; later). In the code below, &lt;span class="math"&gt;\(tree[i] := sum(a[1..i])\)&lt;/span&gt; for prefix sum queries as an example, but the definition of &lt;span class="math"&gt;\(tree[i]\)&lt;/span&gt; is really problem-specific and we can adapt the logic to other kinds of query like &lt;span class="math"&gt;\(\text{xor}, \text{min}, \text{max}\)&lt;/span&gt;, etc when fitted. &lt;em&gt;Be creative!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Overly commented code snippet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+  &lt;span class="sd"&gt;&amp;#39;&amp;#39;&amp;#39;Returns sum(a[1..i]), 1 &amp;lt;= i &amp;lt;= n.&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+
+  &lt;span class="n"&gt;ans&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c1"&gt;# replace += with other combination ops for specific problems at hand&lt;/span&gt;
+    &lt;span class="n"&gt;ans&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="c1"&gt;# remove lsb to traverse to next subrange&lt;/span&gt;
+    &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;-=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;ans&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Generally, BIT only supports prefix range queries, but for specific cases such as range sum or xor we can query any range:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Range sum: &lt;span class="math"&gt;\(sum(a[L..R]) = query(R) - query(L-1)\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Range XOR: &lt;span class="math"&gt;\(\text{xor}(a[L..R]) = query(R)~\text{xor}~ query(L-1)\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="update-relevant-ranges"&gt;Update relevant ranges&lt;/h2&gt;
+&lt;p&gt;We now get to point update operation, &lt;span class="math"&gt;\(u(a[i],v)\)&lt;/span&gt;. As mentioned above, &lt;span class="math"&gt;\(tree[i]\)&lt;/span&gt; stores the current value computed on its corresponding range &lt;span class="math"&gt;\((i-2^{\text{lsb}(i)}..i]\)&lt;/span&gt;. In other words, &lt;span class="math"&gt;\(tree[i]\)&lt;/span&gt; is responsible for the range&lt;span class="math"&gt;\( (i-2^{\text{lsb}(i)}..i]\)&lt;/span&gt;. Thus an update to any element in the range needs to "inform" and update &lt;span class="math"&gt;\(tree[i]\)&lt;/span&gt;. Flip it around, for an update &lt;span class="math"&gt;\(u(a[i], v),\)&lt;/span&gt; we need to update all relevant ranges to which &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; belongs!&lt;/p&gt;
+&lt;p&gt;Denote &lt;span class="math"&gt;\(R_j = (j-2^{\text{lsb}(j)}..j]\)&lt;/span&gt;,&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Claim 1: &lt;span class="math"&gt;\(R_i, R_{i+\text{lsb}(i)}...\)&lt;/span&gt; are the only ranges to which &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; belong.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;For example, given array &lt;span class="math"&gt;\(a[1..8]\)&lt;/span&gt;, what ranges covering &lt;span class="math"&gt;\(a[3]\)&lt;/span&gt;?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(R_3 = (2..3]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_4 = (0..4]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_8 = (0..8]\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.
+&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;
+Proof:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(j) \geq \text{lsb}(i) +1 \Rightarrow 2^{\text{lsb}(j)} \geq 2*2^{\text{lsb}(i)} \Rightarrow j-2^{\text{lsb}(j)} \leq j-2*2^{\text{lsb}(i)} = i+2^{\text{lsb}(i)}-2*2^{\text{lsb}(i)} = i-2^{\text{lsb}(i)}\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Lemma 1 shows that &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; belongs to &lt;span class="math"&gt;\(R_i, R_{i+\text{lsb}(i)}...\)&lt;/span&gt;. Next let see why these ranges are the only ones covering &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt;. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 2&lt;/strong&gt;: For all &lt;span class="math"&gt;\(j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(i &amp;lt; j &amp;lt; i+2^{\text{lsb}(i)}\)&lt;/span&gt;, &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt;
+Proof:
+Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, since for odd &lt;span class="math"&gt;\(i\)&lt;/span&gt;, &lt;span class="math"&gt;\(i+2^{\text{lsb}(i)} = i+1\)&lt;/span&gt;, and there is no integer &lt;span class="math"&gt;\(j \in (i,i+1)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is odd, clearly &lt;span class="math"&gt;\(i \notin R_j = (j-1,j]\)&lt;/span&gt; since &lt;span class="math"&gt;\(i \leq j-1\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is even, &lt;span class="math"&gt;\(k = j-i\)&lt;/span&gt; is even, and &lt;span class="math"&gt;\(k &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;, thus &lt;span class="math"&gt;\(2^{\text{lsb}(k)} &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;. Hence, &lt;span class="math"&gt;\(\text{lsb}(k)\)&lt;/span&gt; is also &lt;span class="math"&gt;\(\text{lsb}(j)\)&lt;/span&gt;. &lt;span class="math"&gt;\(j-2^{\text{lsb}(j)} = j-2^{\text{lsb}(k)} \geq j-k = i\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(i \notin R_j = (j-2^{\text{lsb}(j)}, j]\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now apply Lemma 2 to &lt;span class="math"&gt;\(i' = i+\text{lsb}(i)\)&lt;/span&gt;, &lt;span class="math"&gt;\(\forall j \in (i', i' + \text{lsb}(i')\)&lt;/span&gt;, &lt;span class="math"&gt;\(i' \notin R_j\)&lt;/span&gt; and follows &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt; since &lt;span class="math"&gt;\(i &amp;lt; i'\)&lt;/span&gt;. Repeating this process, we can prove the claim that &lt;span class="math"&gt;\(R_i, R_{i+\text{lsb}(i)},...\)&lt;/span&gt; are the only ranges covering &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; (QED)!&lt;/p&gt;
+&lt;h3 id="implementation-details_1"&gt;Implementation details&lt;/h3&gt;
+&lt;p&gt;With the above claim, it's trivia to implement the update. As an example, this is the snippet for increment update &lt;span class="math"&gt;\(a[i] \leftarrow a[i] + v\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;
+    &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;blockquote&gt;
+&lt;p&gt;Claim 2: There is at most &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; ranges covering &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; for &lt;span class="math"&gt;\(1 \leq i \leq n\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The while loop continues until &lt;span class="math"&gt;\(i\)&lt;/span&gt; goes beyond &lt;span class="math"&gt;\(n\)&lt;/span&gt;. Every iteration update &lt;span class="math"&gt;\(i \leftarrow i + 2^{\text{lsb}(i)}\)&lt;/span&gt;, i.e., it moves the LSB at least one position to the left. Thus there can be at most &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; iterations, and the update op is &lt;span class="math"&gt;\(O(\log n)\)&lt;/span&gt; time, assuming the increment is &lt;span class="math"&gt;\(O(1)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h1 id="recap"&gt;Recap&lt;/h1&gt;
+&lt;p&gt;In this part, we explore key ideas of BIT:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Split range into disjoint subranges based on binary expansion for efficient range query&lt;/li&gt;
+&lt;li&gt;For each point update, we need to update all the ranges covering the point. This is a tradeoff to speed up the range query&lt;/li&gt;
+&lt;li&gt;No single best solution for all usecases. BIT is efficient for large input size with a lot of range queries&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="references"&gt;References&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;https://cp-algorithms.com/data_structures/fenwick.html&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.topcoder.com/community/competitive-programming/tutorials/binary-indexed-trees/"&gt;Topcoder's excellent tutorial&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Data structures"></category><category term="Algorithm"></category><category term="Fenwick tree"></category></entry><entry><title>Estimating Distribution Mean and Quantiles</title><link href="/estimating-distribution-mean-and-quantiles.html" rel="alternate"></link><published>2018-09-22T00:00:00+09:00</published><updated>2018-09-22T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2018-09-22:/estimating-distribution-mean-and-quantiles.html</id><summary type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
 &lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_ …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
@@ -62,7 +265,7 @@
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;/script&gt;</summary><content type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
 &lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_{i=1}^n\)&lt;/span&gt; drawn i.i.d from the distribution, estimate:&lt;/p&gt;
 &lt;ul&gt;
@@ -70,7 +273,7 @@
 &lt;li&gt;The distribution quantiles (e.g., median), i.e., for a &lt;span class="math"&gt;\(\tau \in (0,1)\)&lt;/span&gt;, roughly speaking the smallest value &lt;span class="math"&gt;\(q_{\tau}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(\textrm{Prob}(X \leq q_\tau) = \tau\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: I've tried to keep all the math below valid yet as simple as possible. Feel free to correct me if you find anything horribly wrong.&lt;/p&gt;
-&lt;h2&gt;The mean&lt;/h2&gt;
+&lt;h1 id="the-mean"&gt;The mean&lt;/h1&gt;
 &lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote &lt;span class="math"&gt;\(\mathcal{L}(m) = \int (x-m)^2~p(x)~dx\)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Claim 1&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}(m) = \mu\)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Proof sketch&lt;/em&gt;:
@@ -82,41 +285,41 @@
 &amp;amp;=&amp;amp; \underset{m}{\textrm{argmin}}~\left (m - \int x~p(x)~dx\right )^2 = \int x~p(x)~dx = \mu
 \end{array}
 $$&lt;/div&gt;
-&lt;h3&gt;Sample estimate&lt;/h3&gt;
+&lt;h2 id="sample-estimate"&gt;Sample estimate&lt;/h2&gt;
 &lt;p&gt;Since &lt;span class="math"&gt;\(p(x)\)&lt;/span&gt; is unknown, we instead minimize an approximate of the &lt;span class="math"&gt;\(\mathcal{L}(m)\)&lt;/span&gt; using the given sample, &lt;/p&gt;
 &lt;div class="math"&gt;$$\hat{\mathcal{L}}(m) = \frac{1}{n} \sum_{i=1}^n (x_i - m)^2$$&lt;/div&gt;
 &lt;p&gt; and obtain an estimate of the mean:
 &lt;/p&gt;
 &lt;div class="math"&gt;$$\hat{\mu} = \frac{1}{n} \sum_{i=1}^n~x_i =  \underset{m}{\textrm{argmin}}~\hat{\mathcal{L}}(m)$$&lt;/div&gt;
-&lt;h2&gt;The median&lt;/h2&gt;
-&lt;p&gt;Let &lt;span class="math"&gt;\(F(x)\)&lt;/span&gt; denote the cumulative distribution, i.e., &lt;span class="math"&gt;\(F(x) = \textrm{Prob}(X \leq x)\)&lt;/span&gt;. &lt;/p&gt;
+&lt;h1 id="the-median"&gt;The median&lt;/h1&gt;
+&lt;p&gt;Let &lt;span class="math"&gt;\(F(x)\)&lt;/span&gt; denote the cumulative distribution, i.e., &lt;span class="math"&gt;\(F(x) = \textrm{Prob}(X \leq x)\)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;A median or &lt;span class="math"&gt;\(q_{0.5}\)&lt;/span&gt; is roughly the point which divides the distribution in half, i.e.,
 &lt;/p&gt;
 &lt;div class="math"&gt;$$F(q_{0.5}) = 0.5$$&lt;/div&gt;
 &lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote &lt;/p&gt;
 &lt;div class="math"&gt;$$\mathcal{L}_{0.5} (m) = \int |x-m|~p(x)~dx$$&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Claim 2&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_{0.5}(m) = q_{0.5}\)&lt;/span&gt;. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Claim 2&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_{0.5}(m) = q_{0.5}\)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;See the next section for a proof sketch of a general case of any quantile &lt;span class="math"&gt;\(\tau \in (0,1)\)&lt;/span&gt;.&lt;/p&gt;
-&lt;h3&gt;Sample estimate&lt;/h3&gt;
+&lt;h2 id="sample-estimate_1"&gt;Sample estimate&lt;/h2&gt;
 &lt;p&gt;Similar to the mean estimate, we can obtain an estimate of the median from the given sample,
 &lt;/p&gt;
 &lt;div class="math"&gt;$$\hat{q}_{0.5} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n |x_i-m| = \textrm{median}(\{x_i\}_{i=1}^n)$$&lt;/div&gt;
-&lt;h2&gt;The &lt;span class="math"&gt;\(\tau\)&lt;/span&gt;-quantile&lt;/h2&gt;
+&lt;h1 id="the-tau-quantile"&gt;The &lt;span class="math"&gt;\(\tau\)&lt;/span&gt;-quantile&lt;/h1&gt;
 &lt;p&gt;For an arbitrary &lt;span class="math"&gt;\(m \in \mathbb{R}\)&lt;/span&gt;, denote
 &lt;/p&gt;
 &lt;div class="math"&gt;$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &amp;lt; m})~p(x)~dx$$&lt;/div&gt;
 &lt;p&gt;
 where &lt;/p&gt;
-&lt;div class="math"&gt;$$ 
+&lt;div class="math"&gt;$$
 1_{x &amp;lt; m} = \left\{\begin{array}{ll}
-1 &amp;amp; \text{if}~x &amp;lt; m \\ 
+1 &amp;amp; \text{if}~x &amp;lt; m \\
 0 &amp;amp; \text{otherwise}
 \end{array}\right.
 $$&lt;/div&gt;
 &lt;p&gt;Note that &lt;span class="math"&gt;\((x-m)(\tau - 1_{x &amp;lt; m})\)&lt;/span&gt; is nothing other than the &lt;strong&gt;quantile loss&lt;/strong&gt; often used in &lt;a href="https://en.wikipedia.org/wiki/Quantile_regression"&gt;quantile regression&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Claim 3&lt;/strong&gt;: &lt;span class="math"&gt;\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_\tau (m) = q_{\tau}\)&lt;/span&gt;&lt;/p&gt;
-&lt;h3&gt;Derivation of the quantile loss&lt;/h3&gt;
-&lt;p&gt;Curious readers may wonder how to come up with the above formula of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;. Let me try to &lt;em&gt;reverse-engineer&lt;/em&gt; the quantile loss.&lt;/p&gt;
+&lt;h2 id="derivation-of-the-quantile-loss"&gt;Derivation of the quantile loss&lt;/h2&gt;
+&lt;p&gt;Curious readers may wonder how to come up with the above formula of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;. Let's &lt;em&gt;reverse-engineer&lt;/em&gt; the quantile loss.&lt;/p&gt;
 &lt;p&gt;Given arbitrary &lt;span class="math"&gt;\(0 &amp;lt; c_1, c_2 \in \mathbb{R}\)&lt;/span&gt;, consider a generalized form of the median loss &lt;span class="math"&gt;\(\mathcal{L}_{0.5}\)&lt;/span&gt;, 
 &lt;/p&gt;
 &lt;div class="math"&gt;$$\mathcal{L}_{c_1, c_2}(m) = c_1 \underset{x \geq m}{\int} (x-m)~p(x)~dx + c_2 \underset{x &amp;lt; m}{\int} (m-x)~p(x)~dx$$&lt;/div&gt;
@@ -155,7 +358,7 @@ Since &lt;span class="math"&gt;\(\tau &amp;gt; 0\)&lt;/span&gt;, minimizing &lt;
 &lt;p&gt;
 which is the same as &lt;/p&gt;
 &lt;div class="math"&gt;$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &amp;lt; m})~p(x)~dx$$&lt;/div&gt;
-&lt;h3&gt;Why &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is the minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;?&lt;/h3&gt;
+&lt;h2 id="why-q_tau-is-the-minimizer-of-mathcall_taum"&gt;Why &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is the minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;?&lt;/h2&gt;
 &lt;p&gt;As shown above, &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is a critical point of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v)\)&lt;/span&gt;,
 &lt;/p&gt;
 &lt;div class="math"&gt;$$\frac{d}{dv}\mathcal{L}_{\tau}(v)_{\mid v=\tau} = 0$$&lt;/div&gt;
@@ -164,8 +367,8 @@ which is the same as &lt;/p&gt;
 &lt;li&gt;For any &lt;span class="math"&gt;\(v \geq \tau\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \geq 0\)&lt;/span&gt;; hence &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;. &lt;/li&gt;
 &lt;li&gt;For any &lt;span class="math"&gt;\(v \leq \tau\)&lt;/span&gt;, &lt;span class="math"&gt;\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \leq 0\)&lt;/span&gt;; hence &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;For any &lt;span class="math"&gt;\(v \in [0,1]\)&lt;/span&gt;, &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;. Thus &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v)\)&lt;/span&gt;, or equivalently &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;. &lt;/p&gt;
-&lt;h3&gt;Sample estimate&lt;/h3&gt;
+&lt;p&gt;For any &lt;span class="math"&gt;\(v \in [0,1]\)&lt;/span&gt;, &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)&lt;/span&gt;. Thus &lt;span class="math"&gt;\(\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(v)\)&lt;/span&gt;, or equivalently &lt;span class="math"&gt;\(q_\tau\)&lt;/span&gt; is a minimizer of &lt;span class="math"&gt;\(\mathcal{L}_{\tau}(m)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h2 id="sample-estimate_2"&gt;Sample estimate&lt;/h2&gt;
 &lt;p&gt;Finally, we can obtain an estimate of the quantile as:&lt;/p&gt;
 &lt;div class="math"&gt;$$\hat{q}_{\tau} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n (x_i-m)(\tau - 1_{x_i &amp;lt; m})$$&lt;/div&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {

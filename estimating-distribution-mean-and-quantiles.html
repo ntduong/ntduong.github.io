@@ -24,6 +24,7 @@
         </header><!-- /#banner -->
         <nav id="menu"><ul>
             <li><a href="/pages/about-me.html">About me</a></li>
+            <li><a href="/category/data-structures.html">Data structures</a></li>
             <li class="active"><a href="/category/stats.html">Stats</a></li>
         </ul></nav><!-- /#menu -->
 <section id="content" class="body">
@@ -53,7 +54,7 @@
     </div>
   </footer><!-- /.post-info -->
   <div class="entry-content">
-    <h2>Introduction</h2>
+    <h1 id="introduction">Introduction</h1>
 <p>In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. </p>
 <p>More concretely, consider a univariate continuous random variable <span class="math">\(X\)</span> following an <strong>unknown</strong> distribution with <em>probability density function</em> (pdf) <span class="math">\(p_X (x)\)</span>. Given a sample set <span class="math">\(\{x_i\}_{i=1}^n\)</span> drawn i.i.d from the distribution, estimate:</p>
 <ul>
@@ -61,7 +62,7 @@
 <li>The distribution quantiles (e.g., median), i.e., for a <span class="math">\(\tau \in (0,1)\)</span>, roughly speaking the smallest value <span class="math">\(q_{\tau}\)</span> such that <span class="math">\(\textrm{Prob}(X \leq q_\tau) = \tau\)</span>.</li>
 </ul>
 <p><strong>Disclaimer</strong>: I've tried to keep all the math below valid yet as simple as possible. Feel free to correct me if you find anything horribly wrong.</p>
-<h2>The mean</h2>
+<h1 id="the-mean">The mean</h1>
 <p>For an arbitrary <span class="math">\(m \in \mathbb{R}\)</span>, denote <span class="math">\(\mathcal{L}(m) = \int (x-m)^2~p(x)~dx\)</span>.</p>
 <p><strong>Claim 1</strong>: <span class="math">\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}(m) = \mu\)</span>.</p>
 <p><em>Proof sketch</em>:
@@ -73,41 +74,41 @@
 &amp;=&amp; \underset{m}{\textrm{argmin}}~\left (m - \int x~p(x)~dx\right )^2 = \int x~p(x)~dx = \mu
 \end{array}
 $$</div>
-<h3>Sample estimate</h3>
+<h2 id="sample-estimate">Sample estimate</h2>
 <p>Since <span class="math">\(p(x)\)</span> is unknown, we instead minimize an approximate of the <span class="math">\(\mathcal{L}(m)\)</span> using the given sample, </p>
 <div class="math">$$\hat{\mathcal{L}}(m) = \frac{1}{n} \sum_{i=1}^n (x_i - m)^2$$</div>
 <p> and obtain an estimate of the mean:
 </p>
 <div class="math">$$\hat{\mu} = \frac{1}{n} \sum_{i=1}^n~x_i =  \underset{m}{\textrm{argmin}}~\hat{\mathcal{L}}(m)$$</div>
-<h2>The median</h2>
-<p>Let <span class="math">\(F(x)\)</span> denote the cumulative distribution, i.e., <span class="math">\(F(x) = \textrm{Prob}(X \leq x)\)</span>. </p>
+<h1 id="the-median">The median</h1>
+<p>Let <span class="math">\(F(x)\)</span> denote the cumulative distribution, i.e., <span class="math">\(F(x) = \textrm{Prob}(X \leq x)\)</span>.</p>
 <p>A median or <span class="math">\(q_{0.5}\)</span> is roughly the point which divides the distribution in half, i.e.,
 </p>
 <div class="math">$$F(q_{0.5}) = 0.5$$</div>
 <p>For an arbitrary <span class="math">\(m \in \mathbb{R}\)</span>, denote </p>
 <div class="math">$$\mathcal{L}_{0.5} (m) = \int |x-m|~p(x)~dx$$</div>
-<p><strong>Claim 2</strong>: <span class="math">\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_{0.5}(m) = q_{0.5}\)</span>. </p>
+<p><strong>Claim 2</strong>: <span class="math">\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_{0.5}(m) = q_{0.5}\)</span>.</p>
 <p>See the next section for a proof sketch of a general case of any quantile <span class="math">\(\tau \in (0,1)\)</span>.</p>
-<h3>Sample estimate</h3>
+<h2 id="sample-estimate_1">Sample estimate</h2>
 <p>Similar to the mean estimate, we can obtain an estimate of the median from the given sample,
 </p>
 <div class="math">$$\hat{q}_{0.5} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n |x_i-m| = \textrm{median}(\{x_i\}_{i=1}^n)$$</div>
-<h2>The <span class="math">\(\tau\)</span>-quantile</h2>
+<h1 id="the-tau-quantile">The <span class="math">\(\tau\)</span>-quantile</h1>
 <p>For an arbitrary <span class="math">\(m \in \mathbb{R}\)</span>, denote
 </p>
 <div class="math">$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &lt; m})~p(x)~dx$$</div>
 <p>
 where </p>
-<div class="math">$$ 
+<div class="math">$$
 1_{x &lt; m} = \left\{\begin{array}{ll}
-1 &amp; \text{if}~x &lt; m \\ 
+1 &amp; \text{if}~x &lt; m \\
 0 &amp; \text{otherwise}
 \end{array}\right.
 $$</div>
 <p>Note that <span class="math">\((x-m)(\tau - 1_{x &lt; m})\)</span> is nothing other than the <strong>quantile loss</strong> often used in <a href="https://en.wikipedia.org/wiki/Quantile_regression">quantile regression</a>.</p>
 <p><strong>Claim 3</strong>: <span class="math">\(m^{*} = \underset{m}{\textrm{argmin}}~\mathcal{L}_\tau (m) = q_{\tau}\)</span></p>
-<h3>Derivation of the quantile loss</h3>
-<p>Curious readers may wonder how to come up with the above formula of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>. Let me try to <em>reverse-engineer</em> the quantile loss.</p>
+<h2 id="derivation-of-the-quantile-loss">Derivation of the quantile loss</h2>
+<p>Curious readers may wonder how to come up with the above formula of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>. Let's <em>reverse-engineer</em> the quantile loss.</p>
 <p>Given arbitrary <span class="math">\(0 &lt; c_1, c_2 \in \mathbb{R}\)</span>, consider a generalized form of the median loss <span class="math">\(\mathcal{L}_{0.5}\)</span>, 
 </p>
 <div class="math">$$\mathcal{L}_{c_1, c_2}(m) = c_1 \underset{x \geq m}{\int} (x-m)~p(x)~dx + c_2 \underset{x &lt; m}{\int} (m-x)~p(x)~dx$$</div>
@@ -146,7 +147,7 @@ Since <span class="math">\(\tau &gt; 0\)</span>, minimizing <span class="math">\
 <p>
 which is the same as </p>
 <div class="math">$$\mathcal{L}_{\tau}(m) = \int (x-m)(\tau - 1_{x &lt; m})~p(x)~dx$$</div>
-<h3>Why <span class="math">\(q_\tau\)</span> is the minimizer of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>?</h3>
+<h2 id="why-q_tau-is-the-minimizer-of-mathcall_taum">Why <span class="math">\(q_\tau\)</span> is the minimizer of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>?</h2>
 <p>As shown above, <span class="math">\(\tau\)</span> is a critical point of <span class="math">\(\mathcal{L}_{\tau}(v)\)</span>,
 </p>
 <div class="math">$$\frac{d}{dv}\mathcal{L}_{\tau}(v)_{\mid v=\tau} = 0$$</div>
@@ -155,8 +156,8 @@ which is the same as </p>
 <li>For any <span class="math">\(v \geq \tau\)</span>, <span class="math">\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \geq 0\)</span>; hence <span class="math">\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)</span>. </li>
 <li>For any <span class="math">\(v \leq \tau\)</span>, <span class="math">\(\frac{d}{dv}\mathcal{L}_{\tau}(v) \leq 0\)</span>; hence <span class="math">\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)</span>.</li>
 </ul>
-<p>For any <span class="math">\(v \in [0,1]\)</span>, <span class="math">\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)</span>. Thus <span class="math">\(\tau\)</span> is a minimizer of <span class="math">\(\mathcal{L}_{\tau}(v)\)</span>, or equivalently <span class="math">\(q_\tau\)</span> is a minimizer of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>. </p>
-<h3>Sample estimate</h3>
+<p>For any <span class="math">\(v \in [0,1]\)</span>, <span class="math">\(\mathcal{L}_{\tau}(v) \geq \mathcal{L}_{\tau}(\tau)\)</span>. Thus <span class="math">\(\tau\)</span> is a minimizer of <span class="math">\(\mathcal{L}_{\tau}(v)\)</span>, or equivalently <span class="math">\(q_\tau\)</span> is a minimizer of <span class="math">\(\mathcal{L}_{\tau}(m)\)</span>.</p>
+<h2 id="sample-estimate_2">Sample estimate</h2>
 <p>Finally, we can obtain an estimate of the quantile as:</p>
 <div class="math">$$\hat{q}_{\tau} = \underset{m}{\textrm{argmin}}~\frac{1}{n} \sum_{i=1}^n (x_i-m)(\tau - 1_{x_i &lt; m})$$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {

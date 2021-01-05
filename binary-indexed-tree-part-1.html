@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>Random Notes - Binary Indexed Tree (Part 1)</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
+        <link href="/feeds/data-structures.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="Algorithm" />
+    <meta name="tags" content="Fenwick tree" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Random Notes</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about-me.html">About me</a></li>
+            <li class="active"><a href="/category/data-structures.html">Data structures</a></li>
+            <li><a href="/category/stats.html">Stats</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="/binary-indexed-tree-part-1.html" rel="bookmark"
+         title="Permalink to Binary Indexed Tree (Part 1)">Binary Indexed Tree (Part 1)</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <time class="published" datetime="2021-01-05T00:00:00+09:00">
+      Tue 05 January 2021
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+    </address>
+    <div class="category">
+        Category: <a href="/category/data-structures.html">Data structures</a>
+    </div>
+    <div class="tags">
+        Tags:
+            <a href="/tag/algorithm.html">Algorithm</a>
+            <a href="/tag/fenwick-tree.html">Fenwick tree</a>
+    </div>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <h1 id="motivation">Motivation</h1>
+<p>Binary indexed tree (BIT for short), aka <a href="https://en.wikipedia.org/wiki/Fenwick_tree">Fenwick tree</a>, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a different/new perspective on the data structure, complementing many existing (good) tutorials that I've seen. In particular, in this two-part series,</p>
+<ul>
+<li>Part 1: Distill its core ideas with intuitive explanation provided when needed. If you're already familiar with the standard range-query/point-update BIT, feel free to skip this part.</li>
+<li>Part 2: Building on the core ideas from Part 1, suggest some flexible (and probably lesser-known) ways to extend the data structure to support more usecases, such as range-update/range-query and high-dimensional range queries.</li>
+</ul>
+<p>Last but not least, BIT is one of my all-time favorite data structure, and the underlying ideas are beautiful so I decided to write about it for my future self!</p>
+<h2 id="what-is-bit-anyway">What is BIT anyway?</h2>
+<p>In short, BIT is a data structure, supporting efficient range queries on <strong>dynamic</strong> arrays, i.e., the array content can be updated along the way. More concretely, a standard BIT supports the following operations on an sized-<span class="math">\(n\)</span> array <span class="math">\(a[1..n]\)</span> in <span class="math">\(O(\log n)\)</span> time per op, with additional <span class="math">\(O(n)\)</span> space (for internal structure):</p>
+<ul>
+<li>Prefix range query: <span class="math">\(f(a[1..m])\)</span>, e.g., sum of the first <span class="math">\(m\)</span> elements</li>
+<li>Point update: <span class="math">\(u(a[i], v)\)</span>, e.g., increasing <span class="math">\(a[i]\)</span> by <span class="math">\(v\)</span>, <span class="math">\(a[i] \leftarrow a[i] + v\)</span></li>
+</ul>
+<p>There are ways to enable (range update, point query) and (range update, range query) and they are all built on the key ideas that we're going to touch on later and in the next part.</p>
+<p>Despite its name and many existing tutorials describe it as a tree, I prefer to see BIT as a clever <strong>decomposition of the array</strong> for efficient queries and updates. More about this will be discussed below.</p>
+<p>Honorable mentions:</p>
+<ul>
+<li>
+<p>A more complex and powerful data structure which also support similar operations on dynamic arrays among other things is <a href="https://cp-algorithms.com/data_structures/segment_tree.html">segment tree</a></p>
+</li>
+<li>
+<p>For range queries on <strong>static</strong> arrays (no change to content), simpler data structures such as <a href="https://cp-algorithms.com/data_structures/sparse-table.html">Sparse table</a> (e.g., for range minimum query tasks), block decomposition techniques (e.g., <a href="https://cp-algorithms.com/data_structures/sqrt_decomposition.html">square root decomposition</a>), or even a simple prefix sum array would be enough.</p>
+</li>
+</ul>
+<p>I'll write about these range-queries data structures in a future posts about beautiful and practical data structures (IMHO). So stay tuned!</p>
+<h3 id="why-does-it-matter">Why does it matter?</h3>
+<p>Hang on, for the prefix range query and point update operations above, wouldn't the straightforward <span class="math">\(O(1)\)</span> update, <span class="math">\(O(n)\)</span> query on the array be enough? Why bother with BIT? Well, it depends, e.g.,</p>
+<ul>
+<li>The <span class="math">\(O(1)\)</span> update, <span class="math">\(O(n)\)</span> query approach is reasonable when most operations are update and very few are range query</li>
+<li>When the input size is large with many range queries then <span class="math">\(O(n)\)</span> query isn't ideal and <span class="math">\(O(\log n)\)</span> query at the expense of <span class="math">\(O(\log n)\)</span> update seems better</li>
+</ul>
+<blockquote>
+<p>Cliché: There is no single best solution for all usecases.</p>
+</blockquote>
+<h1 id="key-ideas">Key Ideas</h1>
+<h2 id="range-decomposition">Range decomposition</h2>
+<p>For range query, without any preprocessing, the best we can do is to iterate over the whole range, which is essentially <span class="math">\(O(n)\)</span>. A natural idea is then to split the range into sub-ranges (smaller contiguous blocks) and "precompute" the queries on these blocks. To answer the query on the original range, we can just combine the precomputed answers on smaller sub-ranges.</p>
+<blockquote>
+<p>The key point is to devise efficient split and combine scheme.</p>
+</blockquote>
+<p><strong>Observation 1</strong>: BIT splits a prefix range based on binary expansion.
+Given a range <span class="math">\(R = [1..m] = (0..m]\)</span>, consider binary representation of <span class="math">\(m = 2^{k_1} + 2^{k_2} + ... + 2^{k_t}\)</span>, where <span class="math">\(0 \leq k_1 \leq ... \leq k_t\)</span>. Thus, 
+</p>
+<div class="math">$$
+L = (0..2^{k_1}] \cup (2^{k_1}..(2^{k_1} + 2^{k_2})] \cup ...((2^{k_1}+...+2^{k_{t-1}})..m]
+$$</div>
+<blockquote>
+<p>Clearly, all the subranges are disjoint and together (when union) they cover the whole original range.</p>
+</blockquote>
+<p>How do we quickly <em>traverse</em> all these subranges?</p>
+<blockquote>
+<p>Start with <span class="math">\(m\)</span> and remove the 1s to the right once at a time, starting from the least significant bit!</p>
+</blockquote>
+<p>Example: <span class="math">\(m = 7 = 2^2+2^1+2^0 = 111_{2}\)</span>,</p>
+<ul>
+<li>remove the lsb: <span class="math">\(7 (111) \rightarrow 6 (110)\)</span></li>
+<li>remove the next 1: <span class="math">\(6 (110) \rightarrow 4(100)\)</span></li>
+<li>remove the last 1: <span class="math">\(4(100) \rightarrow 0(000)\)</span>
+Hence, <span class="math">\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]\)</span></li>
+</ul>
+<p>The number of sub-ranges is the number of times the 1s are removed until we reach 0; which is the number of 1s in the binary representation of <span class="math">\(m\)</span>, which is at most <span class="math">\(k_t \leq \log m\)</span> (as <span class="math">\(2^{k_t} \leq m\)</span>).</p>
+<blockquote>
+<p>We can efficiently traverse and combine all the subranges of <span class="math">\([1..n]\)</span> in <span class="math">\(O(\log n)\)</span> time.</p>
+</blockquote>
+<h3 id="remark">Remark</h3>
+<p>This <strong>binary expansion</strong> (also known as <strong>binary lifting</strong>) idea is so beautiful and I see it in many places (no surprise), such as RMQ (sparse table construction and non-idempotent query), finding lowest common ancestor (LCA), finding <span class="math">\(k\)</span>-node-away ancestor of a tree node, etc. For arrays of non-negatives (all prefix sums are non-decreasing), we can use this technique with BIT to find the prefix sum of a specific value in <span class="math">\(O(\log n)\)</span> time, same as binary search but no need for the array being sorted! I won't digress here and the binary lifting idea deserves its own post, for now see e.g., <a href="https://codeforces.com/blog/entry/61364">this post</a> if you're interested.</p>
+<h3 id="implementation-details">Implementation details</h3>
+<p>Given a range <span class="math">\((1..n]\)</span>, it's fairly easy to implement the range query by iteratively extract and remove the least significant bit from <span class="math">\(n\)</span>. Recall modern computer system uses the <a href="https://en.wikipedia.org/wiki/Two%27s_complement">two's conplement</a> representation for integers, it's easy to see <span class="math">\(2^{\text{lsb}(n)} = n \&amp; (-n)\)</span>.</p>
+<p>Let <span class="math">\(tree[i]\)</span> denote the query value computed on the range <span class="math">\((i-(i\&amp;-i)..i]\)</span> (we'll get to how to update these <span class="math">\(tree[1..n]\)</span> later). In the code below, <span class="math">\(tree[i] := sum(a[1..i])\)</span> for prefix sum queries as an example, but the definition of <span class="math">\(tree[i]\)</span> is really problem-specific and we can adapt the logic to other kinds of query like <span class="math">\(\text{xor}, \text{min}, \text{max}\)</span>, etc when fitted. <em>Be creative!</em></p>
+<p>Overly commented code snippet:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+  <span class="sd">&#39;&#39;&#39;Returns sum(a[1..i]), 1 &lt;= i &lt;= n.&#39;&#39;&#39;</span>
+
+  <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">while</span> <span class="n">i</span><span class="p">:</span>
+    <span class="c1"># replace += with other combination ops for specific problems at hand</span>
+    <span class="n">ans</span> <span class="o">+=</span> <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># remove lsb to traverse to next subrange</span>
+    <span class="n">i</span> <span class="o">-=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">ans</span>
+</code></pre></div>
+
+
+<p>Generally, BIT only supports prefix range queries, but for specific cases such as range sum or xor we can query any range:</p>
+<ul>
+<li>Range sum: <span class="math">\(sum(a[L..R]) = query(R) - query(L-1)\)</span></li>
+<li>Range XOR: <span class="math">\(\text{xor}(a[L..R]) = query(R)~\text{xor}~ query(L-1)\)</span></li>
+</ul>
+<h2 id="update-relevant-ranges">Update relevant ranges</h2>
+<p>We now get to point update operation, <span class="math">\(u(a[i],v)\)</span>. As mentioned above, <span class="math">\(tree[i]\)</span> stores the current value computed on its corresponding range <span class="math">\((i-2^{\text{lsb}(i)}..i]\)</span>. In other words, <span class="math">\(tree[i]\)</span> is responsible for the range<span class="math">\( (i-2^{\text{lsb}(i)}..i]\)</span>. Thus an update to any element in the range needs to "inform" and update <span class="math">\(tree[i]\)</span>. Flip it around, for an update <span class="math">\(u(a[i], v),\)</span> we need to update all relevant ranges to which <span class="math">\(a[i]\)</span> belongs!</p>
+<p>Denote <span class="math">\(R_j = (j-2^{\text{lsb}(j)}..j]\)</span>,</p>
+<blockquote>
+<p>Claim 1: <span class="math">\(R_i, R_{i+\text{lsb}(i)}...\)</span> are the only ranges to which <span class="math">\(a[i]\)</span> belong.</p>
+</blockquote>
+<p>For example, given array <span class="math">\(a[1..8]\)</span>, what ranges covering <span class="math">\(a[3]\)</span>?</p>
+<ul>
+<li><span class="math">\(R_3 = (2..3]\)</span>, <span class="math">\(R_4 = (0..4]\)</span>, <span class="math">\(R_8 = (0..8]\)</span></li>
+</ul>
+<p>Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.
+<strong>Lemma 1</strong>: <span class="math">\(R_i \sub R_{i+\text{lsb}(i)}\)</span>
+Proof:</p>
+<ul>
+<li><span class="math">\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)</span></li>
+<li><span class="math">\(\text{lsb}(j) \geq \text{lsb}(i) +1 \Rightarrow 2^{\text{lsb}(j)} \geq 2*2^{\text{lsb}(i)} \Rightarrow j-2^{\text{lsb}(j)} \leq j-2*2^{\text{lsb}(i)} = i+2^{\text{lsb}(i)}-2*2^{\text{lsb}(i)} = i-2^{\text{lsb}(i)}\)</span></li>
+</ul>
+<p>Lemma 1 shows that <span class="math">\(a[i]\)</span> belongs to <span class="math">\(R_i, R_{i+\text{lsb}(i)}...\)</span>. Next let see why these ranges are the only ones covering <span class="math">\(a[i]\)</span>. </p>
+<p><strong>Lemma 2</strong>: For all <span class="math">\(j\)</span> such that <span class="math">\(i &lt; j &lt; i+2^{\text{lsb}(i)}\)</span>, <span class="math">\(i \notin R_j\)</span>
+Proof:
+Note that we only consider even <span class="math">\(i\)</span>, since for odd <span class="math">\(i\)</span>, <span class="math">\(i+2^{\text{lsb}(i)} = i+1\)</span>, and there is no integer <span class="math">\(j \in (i,i+1)\)</span>.</p>
+<ul>
+<li><span class="math">\(j\)</span> is odd, clearly <span class="math">\(i \notin R_j = (j-1,j]\)</span> since <span class="math">\(i \leq j-1\)</span>.</li>
+<li><span class="math">\(j\)</span> is even, <span class="math">\(k = j-i\)</span> is even, and <span class="math">\(k &lt; 2^{\text{lsb}(i)}\)</span>, thus <span class="math">\(2^{\text{lsb}(k)} &lt; 2^{\text{lsb}(i)}\)</span>. Hence, <span class="math">\(\text{lsb}(k)\)</span> is also <span class="math">\(\text{lsb}(j)\)</span>. <span class="math">\(j-2^{\text{lsb}(j)} = j-2^{\text{lsb}(k)} \geq j-k = i\)</span>, i.e., <span class="math">\(i \notin R_j = (j-2^{\text{lsb}(j)}, j]\)</span></li>
+</ul>
+<p>Now apply Lemma 2 to <span class="math">\(i' = i+\text{lsb}(i)\)</span>, <span class="math">\(\forall j \in (i', i' + \text{lsb}(i')\)</span>, <span class="math">\(i' \notin R_j\)</span> and follows <span class="math">\(i \notin R_j\)</span> since <span class="math">\(i &lt; i'\)</span>. Repeating this process, we can prove the claim that <span class="math">\(R_i, R_{i+\text{lsb}(i)},...\)</span> are the only ranges covering <span class="math">\(a[i]\)</span> (QED)!</p>
+<h3 id="implementation-details_1">Implementation details</h3>
+<p>With the above claim, it's trivia to implement the update. As an example, this is the snippet for increment update <span class="math">\(a[i] \leftarrow a[i] + v\)</span>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+  <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
+    <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">v</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">i</span><span class="p">)</span>
+</code></pre></div>
+
+
+<blockquote>
+<p>Claim 2: There is at most <span class="math">\(O(\log n)\)</span> ranges covering <span class="math">\(a[i]\)</span> for <span class="math">\(1 \leq i \leq n\)</span>.</p>
+</blockquote>
+<p>The while loop continues until <span class="math">\(i\)</span> goes beyond <span class="math">\(n\)</span>. Every iteration update <span class="math">\(i \leftarrow i + 2^{\text{lsb}(i)}\)</span>, i.e., it moves the LSB at least one position to the left. Thus there can be at most <span class="math">\(O(\log n)\)</span> iterations, and the update op is <span class="math">\(O(\log n)\)</span> time, assuming the increment is <span class="math">\(O(1)\)</span>.</p>
+<h1 id="recap">Recap</h1>
+<p>In this part, we explore key ideas of BIT:</p>
+<ul>
+<li>Split range into disjoint subranges based on binary expansion for efficient range query</li>
+<li>For each point update, we need to update all the ranges covering the point. This is a tradeoff to speed up the range query</li>
+<li>No single best solution for all usecases. BIT is efficient for large input size with a lot of range queries</li>
+</ul>
+<h1 id="references">References</h1>
+<ol>
+<li>https://cp-algorithms.com/data_structures/fenwick.html</li>
+<li><a href="https://www.topcoder.com/community/competitive-programming/tutorials/binary-indexed-trees/">Topcoder's excellent tutorial</a></li>
+</ol>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>

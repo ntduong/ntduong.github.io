@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>Random Notes - Reservoir Sampling</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
+        <link href="/feeds/algorithm.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="random sampling" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Random Notes</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about-me.html">About me</a></li>
+            <li><a href="/category/data-structures.html">Data structures</a></li>
+            <li><a href="/category/stats.html">Stats</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="/drafts/reservoir-sampling.html" rel="bookmark"
+         title="Permalink to Reservoir Sampling">Reservoir Sampling</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <time class="published" datetime="2020-10-31T00:00:00+09:00">
+      Sat 31 October 2020
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+    </address>
+    <div class="category">
+        Category: <a href="/category/algorithm.html">Algorithm</a>
+    </div>
+    <div class="tags">
+        Tags:
+            <a href="/tag/random-sampling.html">random sampling</a>
+    </div>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <h1 id="getting-started">Getting started</h1>
+<p><a href="https://en.wikipedia.org/wiki/Reservoir_sampling">Reservoir sampling</a> concerns with choosing <span class="math">\(k\)</span> items (i.e., a random sample of size <span class="math">\(k\)</span> or <span class="math">\(k\)</span>-sample for short) from a population of size <span class="math">\(n\)</span> (<span class="math">\(n &gt; k\)</span>) without replacement such that each chosen item is selected randomly with <em>equal chance</em> from the population. </p>
+<p><strong>Q1. What is the probability of an item being selected in the final k-sample?</strong></p>
+<p>Consider an item <span class="math">\(x\)</span> from the population, let <span class="math">\(P_i(x)\)</span> denote the probability that <span class="math">\(x\)</span> is selected at the i-th round. 
+</p>
+<div class="math">$$P(x~\text{is selected}) = \sum_{i=1}^kP_i(x)$$</div>
+<p>As we sample without replacement, <strong><span class="math">\(x\)</span> is selected at the i-th round</strong> means <span class="math">\(x\)</span> <strong>isn't</strong> selected in previous (i-1) rounds.</p>
+<ul>
+<li><span class="math">\(P_1(x) = \frac{1}{n}\)</span></li>
+<li><span class="math">\(P_2(x) = (1-P_1(x)) \times \frac{1}{n-1} = \frac{n-1}{n} \times \frac{1}{n-1} = \frac{1}{n}\)</span></li>
+<li><span class="math">\(P_3(x) = (1-P_1(x)-P_2(x)) \times \frac{1}{n-2} = \frac{1}{n}\)</span></li>
+<li><span class="math">\(\cdots\)</span></li>
+<li><span class="math">\(P_k(x) = \frac{1}{n}\)</span></li>
+</ul>
+<p>Thus, <span class="math">\(P(x~\text{is selected}) = \frac{k}{n}\)</span>.</p>
+<h1 id="stream-setting">Stream setting</h1>
+<p>What if the population size is not known in advance as items coming in a stream (which may be infinite) and/or all items can't be stored in memory? Still the requirement is for a new coming item, the chance it is selected in the current sample should be equal to the chances of any item coming before, i.e., if we have seen <span class="math">\(n\)</span> items so far then the chance of a seen item being selected in the <span class="math">\(k\)</span>-sample is <span class="math">\(k/n\)</span>. The first <span class="math">\(k\)</span> items are always selected. Here comes the idea of sampling with adaptive probability, which I found very elegant!</p>
+<h2 id="sampling-process">Sampling process</h2>
+<ul>
+<li>Keep the first <span class="math">\(k\)</span> items in our sample</li>
+<li>For the <span class="math">\(i^{th}\)</span> item (<span class="math">\(i \geq k+1\)</span>), select the item and thus replace an existing item in the current sample with it <strong>with probability <span class="math">\(p = k/i\)</span></strong>.</li>
+</ul>
+<h2 id="how-does-it-work">How does it work?</h2>
+<p>We can prove <strong>by induction</strong> that at the <span class="math">\(i^{th}\)</span> round (<span class="math">\(i \geq k+1\)</span>), the probability that a seen item being selected is <span class="math">\(k/i\)</span>. Here is the sketch:</p>
+<ul>
+<li>assume the claim is true at the round <span class="math">\(i\)</span></li>
+<li>
+<p>The new item <span class="math">\(x_{i+1}\)</span> comes at the round <span class="math">\(i+1\)</span>, we select it into our current sample with <span class="math">\(p = k/(i+1)\)</span>. What is the probability <span class="math">\(p(y)\)</span> of an existing item <span class="math">\(y\)</span> (came in previous rounds) still being selected at this round?</p>
+<ul>
+<li>before this round, <span class="math">\(p_{before}(y) = k/i\)</span> per the induction assumption</li>
+<li>
+<p>for <span class="math">\(y\)</span> still being selected, it needs to survive the round <span class="math">\(i+1\)</span>, which is one of the 2 following <strong>exclusive</strong> cases:</p>
+<ul>
+<li><span class="math">\(x_{i+1}\)</span> is not selected: <span class="math">\(p_1=(1-\frac{k}{i+1}) = \frac{i+1-k}{i+1}\)</span></li>
+<li><span class="math">\(x_{i+1}\)</span> is selected but it doesn't replace <span class="math">\(y\)</span>: <span class="math">\(p_2=\frac{k}{i+1} \times \frac{k-1}{k} = \frac{k-1}{i+1}\)</span> <ul>
+<li>thus, <span class="math">\(p(y) = p_{before}(y) \times (p_1+p_2) = \frac{k}{i} \times \frac{i}{i+1} = k/(i+1)\)</span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>We just showed that claim is also true at the round <span class="math">\(i+1\)</span>. Hence the claim is true for all rounds thanks to the induction principle.</p>
+<h2 id="implementation">Implementation</h2>
+<ul>
+<li>Add the first <span class="math">\(k\)</span> items to the sample list <span class="math">\(L\)</span> in coming order (1-based indexing)</li>
+<li>Round <span class="math">\(i\)</span>: <span class="math">\(x_i\)</span> comes, draw a random integer <span class="math">\(j \in [1,i]\)</span>, e.g., <code>random.randint(1, i)</code> in Python.<ul>
+<li>if <span class="math">\(j &lt;= k\)</span>, replace L[j] with the current item <span class="math">\(x_i\)</span>, i.e., <span class="math">\(L[j] := x_i\)</span></li>
+<li>else skip the current item</li>
+</ul>
+</li>
+</ul>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>

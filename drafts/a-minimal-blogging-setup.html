@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>Random Notes - A minimal blogging setup</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
+        <link href="/feeds/misc.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="blog" />
+    <meta name="tags" content="pelican" />
+    <meta name="tags" content="github-pages" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Random Notes</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about-me.html">About me</a></li>
+            <li><a href="/category/data-structures.html">Data structures</a></li>
+            <li><a href="/category/stats.html">Stats</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="/drafts/a-minimal-blogging-setup.html" rel="bookmark"
+         title="Permalink to A minimal blogging setup">A minimal blogging setup</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <time class="published" datetime="2020-10-17T00:00:00+09:00">
+      Sat 17 October 2020
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+    </address>
+    <div class="category">
+        Category: <a href="/category/misc.html">Misc</a>
+    </div>
+    <div class="tags">
+        Tags:
+            <a href="/tag/blog.html">blog</a>
+            <a href="/tag/pelican.html">pelican</a>
+            <a href="/tag/github-pages.html">github-pages</a>
+    </div>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <h1 id="motivation">Motivation</h1>
+<p>As a lifelong learner, I often want to write and share about what I've learned. I've been looking for a minimal (and hopefully free) blogging setup, which isn't time-consuming to configure, while still flexible enough for customization. There are a ton of full-fledged options out there, such as Medium, Tumblr, Wordpress etc., but I've been leaning towards more lightweight/casual options such as static-site generators (e.g. Hugo, Pelican just to name a few). I was also impressed with the simplicity of a recently introduced <a href="https://www.fast.ai/2020/01/16/fast_template/">fast.ai template</a>. As an attempt to revive my dusty Pelican-powered blog, I decide to give <a href="https://docs.getpelican.com/en/stable/index.html">Pelican</a> another try due to its relatively simple setup and growing plugins. And it's written in Python so easier for me to grok. Since I've found most tutorials on this topic outdated, this post will serve as an updated reference to my future self and interested readers. I plan to keep it a living post!</p>
+<h1 id="steps">Steps</h1>
+<ol>
+<li>Start with the official Pelican <a href="https://docs.getpelican.com/en/stable/index.html">documentation</a></li>
+<li>Set up <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a> and virtualenv</li>
+<li>
+<p>Install minimally required packages (alternatively, run <code>pip install -r requirements.txt</code>)</p>
+<ul>
+<li><code>pip install pelican Markdown</code></li>
+<li><code>pip install ghp-import</code>: easy to publish to Github pages. More on this later.</li>
+<li><code>pip install jupyter ipython nbconvert matplotlib</code>: for working with Jupyter notebook</li>
+<li><code>pip install beautifulsoup4</code>: needed for TOC generation?</li>
+<li><code>pip install pelican-render-math</code>: rendering math/latex</li>
+<li><code>pip install pelican-jupyter</code>: for notebook markup</li>
+</ul>
+</li>
+<li>
+<p>Run <code>pelican-quickstart</code> command to generate proper folder structure and necessary files, including:</p>
+<ul>
+<li>pelicanconf.py</li>
+<li>publishconf.py</li>
+<li>Makefile, tasks.py</li>
+</ul>
+</li>
+<li>
+<p>Configure plugins</p>
+<ul>
+<li>Modify <code>pelicanconf.py</code></li>
+<li>See <a href="https://docs.getpelican.com/en/stable/index.html">doc</a> for more details.</li>
+</ul>
+</li>
+<li>
+<p>Useful commands</p>
+<ul>
+<li>Themes:<ul>
+<li><code>pelican-themes -l</code>: List all installed themes</li>
+<li><code>pelican-themes --install /path/to/theme --verbose</code>: install a theme<ul>
+<li>Specify <code>THEME=&lt;theme-name&gt;</code> in <code>pelicanconf.py</code></li>
+<li>See <a href="https://docs.getpelican.com/en/stable/pelican-themes.html">doc</a> for more details about themes.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Build:<ul>
+<li><code>make clean</code>: Clean up generated files (e.g., in <code>output/</code> folder)</li>
+<li><code>make html</code>: Generate html files in <code>output/</code> from content files in <code>content/</code> folder</li>
+<li><code>make serve</code>: Start a local server (at <code>localhost:8000</code>)</li>
+<li><code>make devserver</code>: Serve and regenerate files on the fly with content update</li>
+</ul>
+</li>
+<li>Publish (free hosting at Github Pages):<ul>
+<li><code>make publish</code>: Generate files ready for publish</li>
+<li><code>make github</code>: Copy published files into Github Pages-specific branch and push to the remote <code>master</code> branch in the <code>username.github.io</code> repo.<ul>
+<li>Note we use a different branch for published content and don't push local's master branch (containing blog configuration and content source) to the remote <code>master</code></li>
+</ul>
+</li>
+<li>See the Makefile for more details. It's pretty readable!</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Optional</p>
+<ul>
+<li>For content that doesn't change very often and not dated in nature, such as About or Contact pages, put them under <code>content/pages/</code> folder</li>
+<li>Set up comment channels, such as Disqus.</li>
+<li>Find/create/customize themes (currently use <code>simple</code> theme as I'm a minimalist!)</li>
+<li>Configure TOC autogen (somehow <code>extract_toc</code> plugin doesn't work for me)</li>
+</ul>
+</li>
+<li>
+<p>Main places for custom config</p>
+<ul>
+<li><code>pelicanconf.py</code></li>
+<li><code>publishconf.py</code></li>
+<li><code>Makefile</code></li>
+</ul>
+</li>
+</ol>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>
