@@ -10,7 +10,7 @@
 
 
 
-    <meta name="tags" content="random sampling" />
+    <meta name="tags" content="sampling" />
 
 </head>
 
@@ -20,13 +20,14 @@
         </header><!-- /#banner -->
         <nav id="menu"><ul>
             <li><a href="/pages/about-me.html">About me</a></li>
+            <li class="active"><a href="/category/algorithm.html">Algorithm</a></li>
             <li><a href="/category/data-structures.html">Data structures</a></li>
             <li><a href="/category/stats.html">Stats</a></li>
         </ul></nav><!-- /#menu -->
 <section id="content" class="body">
   <header>
     <h2 class="entry-title">
-      <a href="/drafts/reservoir-sampling.html" rel="bookmark"
+      <a href="/reservoir-sampling.html" rel="bookmark"
          title="Permalink to Reservoir Sampling">Reservoir Sampling</a></h2>
  
   </header>
@@ -42,7 +43,7 @@
     </div>
     <div class="tags">
         Tags:
-            <a href="/tag/random-sampling.html">random sampling</a>
+            <a href="/tag/sampling.html">sampling</a>
     </div>
   </footer><!-- /.post-info -->
   <div class="entry-content">
@@ -74,18 +75,16 @@
 <li>assume the claim is true at the round <span class="math">\(i\)</span></li>
 <li>
 <p>The new item <span class="math">\(x_{i+1}\)</span> comes at the round <span class="math">\(i+1\)</span>, we select it into our current sample with <span class="math">\(p = k/(i+1)\)</span>. What is the probability <span class="math">\(p(y)\)</span> of an existing item <span class="math">\(y\)</span> (came in previous rounds) still being selected at this round?</p>
-<ul>
-<li>before this round, <span class="math">\(p_{before}(y) = k/i\)</span> per the induction assumption</li>
+</li>
+<li>
+<p>before this round, <span class="math">\(p_{before}(y) = k/i\)</span> per the induction assumption</p>
+</li>
 <li>
 <p>for <span class="math">\(y\)</span> still being selected, it needs to survive the round <span class="math">\(i+1\)</span>, which is one of the 2 following <strong>exclusive</strong> cases:</p>
 <ul>
 <li><span class="math">\(x_{i+1}\)</span> is not selected: <span class="math">\(p_1=(1-\frac{k}{i+1}) = \frac{i+1-k}{i+1}\)</span></li>
-<li><span class="math">\(x_{i+1}\)</span> is selected but it doesn't replace <span class="math">\(y\)</span>: <span class="math">\(p_2=\frac{k}{i+1} \times \frac{k-1}{k} = \frac{k-1}{i+1}\)</span> <ul>
+<li><span class="math">\(x_{i+1}\)</span> is selected but it doesn't replace <span class="math">\(y\)</span>: <span class="math">\(p_2=\frac{k}{i+1} \times \frac{k-1}{k} = \frac{k-1}{i+1}\)</span> </li>
 <li>thus, <span class="math">\(p(y) = p_{before}(y) \times (p_1+p_2) = \frac{k}{i} \times \frac{i}{i+1} = k/(i+1)\)</span></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -93,11 +92,13 @@
 <h2 id="implementation">Implementation</h2>
 <ul>
 <li>Add the first <span class="math">\(k\)</span> items to the sample list <span class="math">\(L\)</span> in coming order (1-based indexing)</li>
-<li>Round <span class="math">\(i\)</span>: <span class="math">\(x_i\)</span> comes, draw a random integer <span class="math">\(j \in [1,i]\)</span>, e.g., <code>random.randint(1, i)</code> in Python.<ul>
-<li>if <span class="math">\(j &lt;= k\)</span>, replace L[j] with the current item <span class="math">\(x_i\)</span>, i.e., <span class="math">\(L[j] := x_i\)</span></li>
-<li>else skip the current item</li>
-</ul>
+<li>
+<p>Round <span class="math">\(i\)</span>: <span class="math">\(x_i\)</span> comes, draw a random integer <span class="math">\(j \in [1,i]\)</span>, e.g., <code>random.randint(1, i)</code> in Python.</p>
 </li>
+<li>
+<p>if <span class="math">\(j &lt;= k\)</span>, replace L[j] with the current item <span class="math">\(x_i\)</span>, i.e., <span class="math">\(L[j] := x_i\)</span></p>
+</li>
+<li>else skip the current item</li>
 </ul>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",

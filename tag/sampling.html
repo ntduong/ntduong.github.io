@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Random Notes - quantile tag</title>
+        <title>Random Notes - sampling tag</title>
         <meta charset="utf-8" />
         <meta name="generator" content="Pelican" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
@@ -18,20 +18,20 @@
             <li><a href="/category/stats.html">Stats</a></li>
         </ul></nav><!-- /#menu -->
 <section id="content">
-<h2>Articles tagged with quantile</h2>
+<h2>Articles tagged with sampling</h2>
 
 <ol id="post-list">
         <li><article class="hentry">
-                <header> <h2 class="entry-title"><a href="/estimating-distribution-mean-and-quantiles.html" rel="bookmark" title="Permalink to Estimating Distribution Mean and Quantiles">Estimating Distribution Mean and Quantiles</a></h2> </header>
+                <header> <h2 class="entry-title"><a href="/reservoir-sampling.html" rel="bookmark" title="Permalink to Reservoir Sampling">Reservoir Sampling</a></h2> </header>
                 <footer class="post-info">
-                    <time class="published" datetime="2018-09-22T00:00:00+09:00"> Sat 22 September 2018 </time>
+                    <time class="published" datetime="2020-10-31T00:00:00+09:00"> Sat 31 October 2020 </time>
                     <address class="vcard author">By
                         <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
                     </address>
                 </footer><!-- /.post-info -->
-                <div class="entry-content"> <h1 id="introduction">Introduction</h1>
-<p>In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. </p>
-<p>More concretely, consider a univariate continuous random variable <span class="math">\(X\)</span> following an <strong>unknown</strong> distribution with <em>probability density function</em> (pdf) <span class="math">\(p_X (x)\)</span>. Given a sample set <span class="math">\(\{x_i\}_ …</span></p><script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+                <div class="entry-content"> <h1 id="getting-started">Getting started</h1>
+<p><a href="https://en.wikipedia.org/wiki/Reservoir_sampling">Reservoir sampling</a> concerns with choosing <span class="math">\(k\)</span> items (i.e., a random sample of size <span class="math">\(k\)</span> or <span class="math">\(k\)</span>-sample for short) from a population of size <span class="math">\(n\)</span> (<span class="math">\(n &gt; k\)</span>) without replacement such that each chosen item is selected randomly with <em>equal chance</em> from the population. </p>
+<p><strong>Q1. What is the …</strong></p><script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
         linebreak = "false";

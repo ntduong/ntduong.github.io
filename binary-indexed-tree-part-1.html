@@ -21,6 +21,7 @@
         </header><!-- /#banner -->
         <nav id="menu"><ul>
             <li><a href="/pages/about-me.html">About me</a></li>
+            <li><a href="/category/algorithm.html">Algorithm</a></li>
             <li class="active"><a href="/category/data-structures.html">Data structures</a></li>
             <li><a href="/category/stats.html">Stats</a></li>
         </ul></nav><!-- /#menu -->
@@ -148,17 +149,17 @@ Hence, <span class="math">\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]\)</sp
 <ul>
 <li><span class="math">\(R_3 = (2..3]\)</span>, <span class="math">\(R_4 = (0..4]\)</span>, <span class="math">\(R_8 = (0..8]\)</span></li>
 </ul>
-<p>Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.
-<strong>Lemma 1</strong>: <span class="math">\(R_i \sub R_{i+\text{lsb}(i)}\)</span>
-Proof:</p>
+<p>Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.</p>
+<p><strong>Lemma 1</strong>: <span class="math">\(R_i \sub R_{i+\text{lsb}(i)}\)</span></p>
+<p>Proof:</p>
 <ul>
 <li><span class="math">\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)</span></li>
 <li><span class="math">\(\text{lsb}(j) \geq \text{lsb}(i) +1 \Rightarrow 2^{\text{lsb}(j)} \geq 2*2^{\text{lsb}(i)} \Rightarrow j-2^{\text{lsb}(j)} \leq j-2*2^{\text{lsb}(i)} = i+2^{\text{lsb}(i)}-2*2^{\text{lsb}(i)} = i-2^{\text{lsb}(i)}\)</span></li>
 </ul>
 <p>Lemma 1 shows that <span class="math">\(a[i]\)</span> belongs to <span class="math">\(R_i, R_{i+\text{lsb}(i)}...\)</span>. Next let see why these ranges are the only ones covering <span class="math">\(a[i]\)</span>. </p>
-<p><strong>Lemma 2</strong>: For all <span class="math">\(j\)</span> such that <span class="math">\(i &lt; j &lt; i+2^{\text{lsb}(i)}\)</span>, <span class="math">\(i \notin R_j\)</span>
-Proof:
-Note that we only consider even <span class="math">\(i\)</span>, since for odd <span class="math">\(i\)</span>, <span class="math">\(i+2^{\text{lsb}(i)} = i+1\)</span>, and there is no integer <span class="math">\(j \in (i,i+1)\)</span>.</p>
+<p><strong>Lemma 2</strong>: For all <span class="math">\(j\)</span> such that <span class="math">\(i &lt; j &lt; i+2^{\text{lsb}(i)}\)</span>, <span class="math">\(i \notin R_j\)</span></p>
+<p>Proof:</p>
+<p>Note that we only consider even <span class="math">\(i\)</span>, since for odd <span class="math">\(i\)</span>, <span class="math">\(i+2^{\text{lsb}(i)} = i+1\)</span>, and there is no integer <span class="math">\(j \in (i,i+1)\)</span>.</p>
 <ul>
 <li><span class="math">\(j\)</span> is odd, clearly <span class="math">\(i \notin R_j = (j-1,j]\)</span> since <span class="math">\(i \leq j-1\)</span>.</li>
 <li><span class="math">\(j\)</span> is even, <span class="math">\(k = j-i\)</span> is even, and <span class="math">\(k &lt; 2^{\text{lsb}(i)}\)</span>, thus <span class="math">\(2^{\text{lsb}(k)} &lt; 2^{\text{lsb}(i)}\)</span>. Hence, <span class="math">\(\text{lsb}(k)\)</span> is also <span class="math">\(\text{lsb}(j)\)</span>. <span class="math">\(j-2^{\text{lsb}(j)} = j-2^{\text{lsb}(k)} \geq j-k = i\)</span>, i.e., <span class="math">\(i \notin R_j = (j-2^{\text{lsb}(j)}, j]\)</span></li>

@@ -100,17 +100,17 @@ Hence, &lt;span class="math"&gt;\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(R_3 = (2..3]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_4 = (0..4]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_8 = (0..8]\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.
-&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;
-Proof:&lt;/p&gt;
+&lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Proof:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)&lt;/span&gt;&lt;/li&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(j) \geq \text{lsb}(i) +1 \Rightarrow 2^{\text{lsb}(j)} \geq 2*2^{\text{lsb}(i)} \Rightarrow j-2^{\text{lsb}(j)} \leq j-2*2^{\text{lsb}(i)} = i+2^{\text{lsb}(i)}-2*2^{\text{lsb}(i)} = i-2^{\text{lsb}(i)}\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Lemma 1 shows that &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; belongs to &lt;span class="math"&gt;\(R_i, R_{i+\text{lsb}(i)}...\)&lt;/span&gt;. Next let see why these ranges are the only ones covering &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt;. &lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Lemma 2&lt;/strong&gt;: For all &lt;span class="math"&gt;\(j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(i &amp;lt; j &amp;lt; i+2^{\text{lsb}(i)}\)&lt;/span&gt;, &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt;
-Proof:
-Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, since for odd &lt;span class="math"&gt;\(i\)&lt;/span&gt;, &lt;span class="math"&gt;\(i+2^{\text{lsb}(i)} = i+1\)&lt;/span&gt;, and there is no integer &lt;span class="math"&gt;\(j \in (i,i+1)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 2&lt;/strong&gt;: For all &lt;span class="math"&gt;\(j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(i &amp;lt; j &amp;lt; i+2^{\text{lsb}(i)}\)&lt;/span&gt;, &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Proof:&lt;/p&gt;
+&lt;p&gt;Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, since for odd &lt;span class="math"&gt;\(i\)&lt;/span&gt;, &lt;span class="math"&gt;\(i+2^{\text{lsb}(i)} = i+1\)&lt;/span&gt;, and there is no integer &lt;span class="math"&gt;\(j \in (i,i+1)\)&lt;/span&gt;.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is odd, clearly &lt;span class="math"&gt;\(i \notin R_j = (j-1,j]\)&lt;/span&gt; since &lt;span class="math"&gt;\(i \leq j-1\)&lt;/span&gt;.&lt;/li&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is even, &lt;span class="math"&gt;\(k = j-i\)&lt;/span&gt; is even, and &lt;span class="math"&gt;\(k &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;, thus &lt;span class="math"&gt;\(2^{\text{lsb}(k)} &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;. Hence, &lt;span class="math"&gt;\(\text{lsb}(k)\)&lt;/span&gt; is also &lt;span class="math"&gt;\(\text{lsb}(j)\)&lt;/span&gt;. &lt;span class="math"&gt;\(j-2^{\text{lsb}(j)} = j-2^{\text{lsb}(k)} \geq j-k = i\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(i \notin R_j = (j-2^{\text{lsb}(j)}, j]\)&lt;/span&gt;&lt;/li&gt;

@@ -1,17 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-          <title>Random Notes - Log-Sum-Exp Trick</title>
+        <title>Random Notes - Algorithm category</title>
         <meta charset="utf-8" />
         <meta name="generator" content="Pelican" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
-        <link href="/feeds/misc.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
-
-
-
-
-    <meta name="tags" content="numerical coding" />
-
+        <link href="/feeds/algorithm.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
 </head>
 
 <body id="index" class="home">
@@ -20,37 +14,25 @@
         </header><!-- /#banner -->
         <nav id="menu"><ul>
             <li><a href="/pages/about-me.html">About me</a></li>
+            <li class="active"><a href="/category/algorithm.html">Algorithm</a></li>
             <li><a href="/category/data-structures.html">Data structures</a></li>
             <li><a href="/category/stats.html">Stats</a></li>
         </ul></nav><!-- /#menu -->
-<section id="content" class="body">
-  <header>
-    <h2 class="entry-title">
-      <a href="/drafts/log-sum-exp-trick.html" rel="bookmark"
-         title="Permalink to Log-Sum-Exp Trick">Log-Sum-Exp Trick</a></h2>
- 
-  </header>
-  <footer class="post-info">
-    <time class="published" datetime="2020-12-22T00:00:00+09:00">
-      Tue 22 December 2020
-    </time>
-    <address class="vcard author">
-      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
-    </address>
-    <div class="category">
-        Category: <a href="/category/misc.html">misc</a>
-    </div>
-    <div class="tags">
-        Tags:
-            <a href="/tag/numerical-coding.html">numerical coding</a>
-    </div>
-  </footer><!-- /.post-info -->
-  <div class="entry-content">
-    <h1 id="underflow-and-the-log-sum-exp-trick">Underflow and the log-sum-exp trick</h1>
-<p>Some time, you may need to compute the logarithm of a sum of very small numbers, e.g., when computing quantities for reasonably long sequences under a HMM model.</p>
-<p>To be concrete, consider <span class="math">\(S = \log\sum_{i=1}^n e^{a_i}\)</span> when <span class="math">\(a_i \ll 0\)</span> and thus <span class="math">\(e^{a_i} &gt; 0\)</span> are super small. Computing <span class="math">\(S\)</span> in this case may result in underflow. To avoid the issue, we can use the <em>log-sum-exp trick</em>. Let <span class="math">\(b = \max_{i=1}^n a_i\)</span>, then <span class="math">\(S = \log e^b\sum_{i=1}^n e^{a_i-b} = b + \log\sum_{i=1}^n e^{a_i-b}\)</span>. <em>Why is this better</em>? At least, <span class="math">\(a_i-b \geq a_i\)</span>, and we extract the significant value <span class="math">\(b\)</span> out of the sum. Despite the name, the key idea here is the shift by subtracting the maximum value, which makes the numerical computation more stable.</p>
-<p>Intuitively, <span class="math">\(S \approx max_{i=1}^n a_i\)</span>.</p>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+<section id="content">
+<h2>Articles in the Algorithm category</h2>
+
+<ol id="post-list">
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/reservoir-sampling.html" rel="bookmark" title="Permalink to Reservoir Sampling">Reservoir Sampling</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2020-10-31T00:00:00+09:00"> Sat 31 October 2020 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <h1 id="getting-started">Getting started</h1>
+<p><a href="https://en.wikipedia.org/wiki/Reservoir_sampling">Reservoir sampling</a> concerns with choosing <span class="math">\(k\)</span> items (i.e., a random sample of size <span class="math">\(k\)</span> or <span class="math">\(k\)</span>-sample for short) from a population of size <span class="math">\(n\)</span> (<span class="math">\(n &gt; k\)</span>) without replacement such that each chosen item is selected randomly with <em>equal chance</em> from the population. </p>
+<p><strong>Q1. What is the …</strong></p><script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
         linebreak = "false";
@@ -111,9 +93,10 @@
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-</script>
-  </div><!-- /.entry-content -->
-</section>
+</script> </div><!-- /.entry-content -->
+        </article></li>
+</ol><!-- /#posts-list -->
+</section><!-- /#content -->
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
                 Proudly powered by <a href="https://getpelican.com/">Pelican</a>,

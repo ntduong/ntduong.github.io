@@ -1,6 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Tue, 05 Jan 2021 00:00:00 +0900</lastBuildDate><item><title>Binary Indexed Tree (Part 1)</title><link>/binary-indexed-tree-part-1.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
-&lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Tue, 05 Jan 2021 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2021-01-05:/binary-indexed-tree-part-1.html</guid><category>Data structures</category><category>Algorithm</category><category>Fenwick tree</category></item><item><title>Estimating Distribution Mean and Quantiles</title><link>/estimating-distribution-mean-and-quantiles.html</link><description>&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Tue, 05 Jan 2021 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2021-01-05:/binary-indexed-tree-part-1.html</guid><category>Data structures</category><category>Algorithm</category><category>Fenwick tree</category></item><item><title>Reservoir Sampling</title><link>/reservoir-sampling.html</link><description>&lt;h1 id="getting-started"&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Reservoir_sampling"&gt;Reservoir sampling&lt;/a&gt; concerns with choosing &lt;span class="math"&gt;\(k\)&lt;/span&gt; items (i.e., a random sample of size &lt;span class="math"&gt;\(k\)&lt;/span&gt; or &lt;span class="math"&gt;\(k\)&lt;/span&gt;-sample for short) from a population of size &lt;span class="math"&gt;\(n\)&lt;/span&gt; (&lt;span class="math"&gt;\(n &amp;gt; k\)&lt;/span&gt;) without replacement such that each chosen item is selected randomly with &lt;em&gt;equal chance&lt;/em&gt; from the population. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q1. What is the …&lt;/strong&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Sat, 31 Oct 2020 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2020-10-31:/reservoir-sampling.html</guid><category>Algorithm</category><category>sampling</category></item><item><title>Estimating Distribution Mean and Quantiles</title><link>/estimating-distribution-mean-and-quantiles.html</link><description>&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
 &lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_ …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",

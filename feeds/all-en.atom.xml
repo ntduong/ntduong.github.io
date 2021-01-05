@@ -100,17 +100,17 @@ Hence, &lt;span class="math"&gt;\([1..7] = (0..7] = (0,4] \cup (4,6] \cup (6, 7]
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(R_3 = (2..3]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_4 = (0..4]\)&lt;/span&gt;, &lt;span class="math"&gt;\(R_8 = (0..8]\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.
-&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;
-Proof:&lt;/p&gt;
+&lt;p&gt;Not convinced yet? Here is a proof sketch, which also gives some insights into the BIT structure.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 1&lt;/strong&gt;: &lt;span class="math"&gt;\(R_i \sub R_{i+\text{lsb}(i)}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Proof:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(i) \leq 0 \Rightarrow j = i+\text{lsb}(i) \geq i\)&lt;/span&gt;&lt;/li&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(\text{lsb}(j) \geq \text{lsb}(i) +1 \Rightarrow 2^{\text{lsb}(j)} \geq 2*2^{\text{lsb}(i)} \Rightarrow j-2^{\text{lsb}(j)} \leq j-2*2^{\text{lsb}(i)} = i+2^{\text{lsb}(i)}-2*2^{\text{lsb}(i)} = i-2^{\text{lsb}(i)}\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Lemma 1 shows that &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; belongs to &lt;span class="math"&gt;\(R_i, R_{i+\text{lsb}(i)}...\)&lt;/span&gt;. Next let see why these ranges are the only ones covering &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt;. &lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Lemma 2&lt;/strong&gt;: For all &lt;span class="math"&gt;\(j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(i &amp;lt; j &amp;lt; i+2^{\text{lsb}(i)}\)&lt;/span&gt;, &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt;
-Proof:
-Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, since for odd &lt;span class="math"&gt;\(i\)&lt;/span&gt;, &lt;span class="math"&gt;\(i+2^{\text{lsb}(i)} = i+1\)&lt;/span&gt;, and there is no integer &lt;span class="math"&gt;\(j \in (i,i+1)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Lemma 2&lt;/strong&gt;: For all &lt;span class="math"&gt;\(j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(i &amp;lt; j &amp;lt; i+2^{\text{lsb}(i)}\)&lt;/span&gt;, &lt;span class="math"&gt;\(i \notin R_j\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Proof:&lt;/p&gt;
+&lt;p&gt;Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, since for odd &lt;span class="math"&gt;\(i\)&lt;/span&gt;, &lt;span class="math"&gt;\(i+2^{\text{lsb}(i)} = i+1\)&lt;/span&gt;, and there is no integer &lt;span class="math"&gt;\(j \in (i,i+1)\)&lt;/span&gt;.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is odd, clearly &lt;span class="math"&gt;\(i \notin R_j = (j-1,j]\)&lt;/span&gt; since &lt;span class="math"&gt;\(i \leq j-1\)&lt;/span&gt;.&lt;/li&gt;
 &lt;li&gt;&lt;span class="math"&gt;\(j\)&lt;/span&gt; is even, &lt;span class="math"&gt;\(k = j-i\)&lt;/span&gt; is even, and &lt;span class="math"&gt;\(k &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;, thus &lt;span class="math"&gt;\(2^{\text{lsb}(k)} &amp;lt; 2^{\text{lsb}(i)}\)&lt;/span&gt;. Hence, &lt;span class="math"&gt;\(\text{lsb}(k)\)&lt;/span&gt; is also &lt;span class="math"&gt;\(\text{lsb}(j)\)&lt;/span&gt;. &lt;span class="math"&gt;\(j-2^{\text{lsb}(j)} = j-2^{\text{lsb}(k)} \geq j-k = i\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(i \notin R_j = (j-2^{\text{lsb}(j)}, j]\)&lt;/span&gt;&lt;/li&gt;
@@ -202,7 +202,184 @@ Note that we only consider even &lt;span class="math"&gt;\(i\)&lt;/span&gt;, sin
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="Data structures"></category><category term="Algorithm"></category><category term="Fenwick tree"></category></entry><entry><title>Estimating Distribution Mean and Quantiles</title><link href="/estimating-distribution-mean-and-quantiles.html" rel="alternate"></link><published>2018-09-22T00:00:00+09:00</published><updated>2018-09-22T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2018-09-22:/estimating-distribution-mean-and-quantiles.html</id><summary type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
+&lt;/script&gt;</content><category term="Data structures"></category><category term="Algorithm"></category><category term="Fenwick tree"></category></entry><entry><title>Reservoir Sampling</title><link href="/reservoir-sampling.html" rel="alternate"></link><published>2020-10-31T00:00:00+09:00</published><updated>2020-10-31T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2020-10-31:/reservoir-sampling.html</id><summary type="html">&lt;h1 id="getting-started"&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Reservoir_sampling"&gt;Reservoir sampling&lt;/a&gt; concerns with choosing &lt;span class="math"&gt;\(k\)&lt;/span&gt; items (i.e., a random sample of size &lt;span class="math"&gt;\(k\)&lt;/span&gt; or &lt;span class="math"&gt;\(k\)&lt;/span&gt;-sample for short) from a population of size &lt;span class="math"&gt;\(n\)&lt;/span&gt; (&lt;span class="math"&gt;\(n &amp;gt; k\)&lt;/span&gt;) without replacement such that each chosen item is selected randomly with &lt;em&gt;equal chance&lt;/em&gt; from the population. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q1. What is the …&lt;/strong&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><content type="html">&lt;h1 id="getting-started"&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Reservoir_sampling"&gt;Reservoir sampling&lt;/a&gt; concerns with choosing &lt;span class="math"&gt;\(k\)&lt;/span&gt; items (i.e., a random sample of size &lt;span class="math"&gt;\(k\)&lt;/span&gt; or &lt;span class="math"&gt;\(k\)&lt;/span&gt;-sample for short) from a population of size &lt;span class="math"&gt;\(n\)&lt;/span&gt; (&lt;span class="math"&gt;\(n &amp;gt; k\)&lt;/span&gt;) without replacement such that each chosen item is selected randomly with &lt;em&gt;equal chance&lt;/em&gt; from the population. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q1. What is the probability of an item being selected in the final k-sample?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Consider an item &lt;span class="math"&gt;\(x\)&lt;/span&gt; from the population, let &lt;span class="math"&gt;\(P_i(x)\)&lt;/span&gt; denote the probability that &lt;span class="math"&gt;\(x\)&lt;/span&gt; is selected at the i-th round. 
+&lt;/p&gt;
+&lt;div class="math"&gt;$$P(x~\text{is selected}) = \sum_{i=1}^kP_i(x)$$&lt;/div&gt;
+&lt;p&gt;As we sample without replacement, &lt;strong&gt;&lt;span class="math"&gt;\(x\)&lt;/span&gt; is selected at the i-th round&lt;/strong&gt; means &lt;span class="math"&gt;\(x\)&lt;/span&gt; &lt;strong&gt;isn't&lt;/strong&gt; selected in previous (i-1) rounds.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(P_1(x) = \frac{1}{n}\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(P_2(x) = (1-P_1(x)) \times \frac{1}{n-1} = \frac{n-1}{n} \times \frac{1}{n-1} = \frac{1}{n}\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(P_3(x) = (1-P_1(x)-P_2(x)) \times \frac{1}{n-2} = \frac{1}{n}\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\cdots\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(P_k(x) = \frac{1}{n}\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thus, &lt;span class="math"&gt;\(P(x~\text{is selected}) = \frac{k}{n}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h1 id="stream-setting"&gt;Stream setting&lt;/h1&gt;
+&lt;p&gt;What if the population size is not known in advance as items coming in a stream (which may be infinite) and/or all items can't be stored in memory? Still the requirement is for a new coming item, the chance it is selected in the current sample should be equal to the chances of any item coming before, i.e., if we have seen &lt;span class="math"&gt;\(n\)&lt;/span&gt; items so far then the chance of a seen item being selected in the &lt;span class="math"&gt;\(k\)&lt;/span&gt;-sample is &lt;span class="math"&gt;\(k/n\)&lt;/span&gt;. The first &lt;span class="math"&gt;\(k\)&lt;/span&gt; items are always selected. Here comes the idea of sampling with adaptive probability, which I found very elegant!&lt;/p&gt;
+&lt;h2 id="sampling-process"&gt;Sampling process&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Keep the first &lt;span class="math"&gt;\(k\)&lt;/span&gt; items in our sample&lt;/li&gt;
+&lt;li&gt;For the &lt;span class="math"&gt;\(i^{th}\)&lt;/span&gt; item (&lt;span class="math"&gt;\(i \geq k+1\)&lt;/span&gt;), select the item and thus replace an existing item in the current sample with it &lt;strong&gt;with probability &lt;span class="math"&gt;\(p = k/i\)&lt;/span&gt;&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="how-does-it-work"&gt;How does it work?&lt;/h2&gt;
+&lt;p&gt;We can prove &lt;strong&gt;by induction&lt;/strong&gt; that at the &lt;span class="math"&gt;\(i^{th}\)&lt;/span&gt; round (&lt;span class="math"&gt;\(i \geq k+1\)&lt;/span&gt;), the probability that a seen item being selected is &lt;span class="math"&gt;\(k/i\)&lt;/span&gt;. Here is the sketch:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;assume the claim is true at the round &lt;span class="math"&gt;\(i\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The new item &lt;span class="math"&gt;\(x_{i+1}\)&lt;/span&gt; comes at the round &lt;span class="math"&gt;\(i+1\)&lt;/span&gt;, we select it into our current sample with &lt;span class="math"&gt;\(p = k/(i+1)\)&lt;/span&gt;. What is the probability &lt;span class="math"&gt;\(p(y)\)&lt;/span&gt; of an existing item &lt;span class="math"&gt;\(y\)&lt;/span&gt; (came in previous rounds) still being selected at this round?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;before this round, &lt;span class="math"&gt;\(p_{before}(y) = k/i\)&lt;/span&gt; per the induction assumption&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;for &lt;span class="math"&gt;\(y\)&lt;/span&gt; still being selected, it needs to survive the round &lt;span class="math"&gt;\(i+1\)&lt;/span&gt;, which is one of the 2 following &lt;strong&gt;exclusive&lt;/strong&gt; cases:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(x_{i+1}\)&lt;/span&gt; is not selected: &lt;span class="math"&gt;\(p_1=(1-\frac{k}{i+1}) = \frac{i+1-k}{i+1}\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(x_{i+1}\)&lt;/span&gt; is selected but it doesn't replace &lt;span class="math"&gt;\(y\)&lt;/span&gt;: &lt;span class="math"&gt;\(p_2=\frac{k}{i+1} \times \frac{k-1}{k} = \frac{k-1}{i+1}\)&lt;/span&gt; &lt;/li&gt;
+&lt;li&gt;thus, &lt;span class="math"&gt;\(p(y) = p_{before}(y) \times (p_1+p_2) = \frac{k}{i} \times \frac{i}{i+1} = k/(i+1)\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We just showed that claim is also true at the round &lt;span class="math"&gt;\(i+1\)&lt;/span&gt;. Hence the claim is true for all rounds thanks to the induction principle.&lt;/p&gt;
+&lt;h2 id="implementation"&gt;Implementation&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Add the first &lt;span class="math"&gt;\(k\)&lt;/span&gt; items to the sample list &lt;span class="math"&gt;\(L\)&lt;/span&gt; in coming order (1-based indexing)&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Round &lt;span class="math"&gt;\(i\)&lt;/span&gt;: &lt;span class="math"&gt;\(x_i\)&lt;/span&gt; comes, draw a random integer &lt;span class="math"&gt;\(j \in [1,i]\)&lt;/span&gt;, e.g., &lt;code&gt;random.randint(1, i)&lt;/code&gt; in Python.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;if &lt;span class="math"&gt;\(j &amp;lt;= k\)&lt;/span&gt;, replace L[j] with the current item &lt;span class="math"&gt;\(x_i\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(L[j] := x_i\)&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;else skip the current item&lt;/li&gt;
+&lt;/ul&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Algorithm"></category><category term="sampling"></category></entry><entry><title>Estimating Distribution Mean and Quantiles</title><link href="/estimating-distribution-mean-and-quantiles.html" rel="alternate"></link><published>2018-09-22T00:00:00+09:00</published><updated>2018-09-22T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2018-09-22:/estimating-distribution-mean-and-quantiles.html</id><summary type="html">&lt;h1 id="introduction"&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;In this note, we look into the problem of estimating various statistics such as mean, quantiles of an unknown distribution from its sample. &lt;/p&gt;
 &lt;p&gt;More concretely, consider a univariate continuous random variable &lt;span class="math"&gt;\(X\)&lt;/span&gt; following an &lt;strong&gt;unknown&lt;/strong&gt; distribution with &lt;em&gt;probability density function&lt;/em&gt; (pdf) &lt;span class="math"&gt;\(p_X (x)\)&lt;/span&gt;. Given a sample set &lt;span class="math"&gt;\(\{x_i\}_ …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
