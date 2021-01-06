@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>Random Notes - Binary Indexed Tree (Part 2)</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Full Atom Feed" />
+        <link href="/feeds/data-structures.atom.xml" type="application/atom+xml" rel="alternate" title="Random Notes Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="Algorithm" />
+    <meta name="tags" content="Fenwick tree" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Random Notes</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about-me.html">About me</a></li>
+            <li><a href="/category/algorithm.html">Algorithm</a></li>
+            <li class="active"><a href="/category/data-structures.html">Data structures</a></li>
+            <li><a href="/category/stats.html">Stats</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="/binary-indexed-tree-part-2.html" rel="bookmark"
+         title="Permalink to Binary Indexed Tree (Part 2)">Binary Indexed Tree (Part 2)</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <time class="published" datetime="2021-01-06T00:00:00+09:00">
+      Wed 06 January 2021
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/duong-nguyen.html">Duong Nguyen</a>
+    </address>
+    <div class="category">
+        Category: <a href="/category/data-structures.html">Data structures</a>
+    </div>
+    <div class="tags">
+        Tags:
+            <a href="/tag/algorithm.html">Algorithm</a>
+            <a href="/tag/fenwick-tree.html">Fenwick tree</a>
+    </div>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <h1 id="motivation">Motivation</h1>
+<p>Building on ideas from <a href="https://ntduong.github.io/binary-indexed-tree-part-1.html">Part 1</a>, in this part, we explore some lesser-known extensions and applications of BIT.</p>
+<p>This is by no means a finished post, and I'll keep updating whenever I find new BIT applications/extensions.</p>
+<h1 id="variation-1-range-update-point-query">Variation 1: Range update, Point query</h1>
+<p>We want the data structure, which supports the following operations on an input array <span class="math">\(a[1..n]\)</span>:</p>
+<ul>
+<li><code>range_update(L, R, v)</code>: increase all <span class="math">\(a[L..R]\)</span> by <span class="math">\(v\)</span></li>
+<li><code>point_query(i)</code>: return the current <span class="math">\(a[i]\)</span></li>
+</ul>
+<p>Recall from Part 1, normal BIT only supports range prefix queries and point updates. How are we going to implement point query, range update with existing operations?</p>
+<p>Consider the diff array <code>d[1..n]</code>, <code>d[1] = a[1], d[i] = a[i]-a[i-1]</code> for <code>i=2,...,n</code>,
+<code>a[i] = d[i] + d[i-1] + ... + d[1]</code> for <code>i=1,...,n</code>.</p>
+<blockquote>
+<p>The key idea is to use the basic range query-point update BIT on the <strong>diff array <span class="math">\(d[1..n]\)</span></strong> instead of the original array <span class="math">\(a[1..n]\)</span>.</p>
+</blockquote>
+<p>Clearly, <code>query(i)</code> = <code>sum(d[1..i])</code> = <code>a[i]</code>.</p>
+<p>Now think about the range update <code>u(L,R,v)</code>, <span class="math">\(a[i] \leftarrow a[i]+v\)</span> for all <span class="math">\(L \leq i \leq R\)</span>, how does the diff array change with the update?</p>
+<ul>
+<li>No change to <span class="math">\(d[i]\)</span> for any <span class="math">\(i &lt; L\)</span>, <span class="math">\(L+1 \leq i \leq R\)</span>, <span class="math">\(R+1 &lt; i\)</span></li>
+<li><span class="math">\(d[L] \leftarrow d[L] + v\)</span></li>
+<li><span class="math">\(d[R+1] \leftarrow d[R+1] - v\)</span></li>
+</ul>
+<p>Thus we can achieve the range update <code>u(L,R,v)</code> with two point updates:</p>
+<ul>
+<li><code>update(L,v)</code></li>
+<li><code>update(R+1,-v)</code></li>
+</ul>
+<p>See also my <a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit_variants.cpp#L18">reference implementation</a> in C++ if you're interested.</p>
+<h1 id="variation-2-range-update-range-query">Variation 2: Range update, Range query</h1>
+<p>We want the data structure, which supports the following operations on an input array <span class="math">\(a[1..n]\)</span>:</p>
+<ul>
+<li><code>range_update(L, R, v)</code>: increase all <span class="math">\(a[L..R]\)</span> by <span class="math">\(v\)</span></li>
+<li><code>range_query(i)</code>: return the prefix sum up to <span class="math">\(i\)</span>, i.e., <span class="math">\(\sum_{j=1}^i a[j]\)</span></li>
+</ul>
+<p>We've seen above how range update can be implemented. Let see how prefix range queries at different <span class="math">\(i\)</span>s change after a <code>range_update(L,R,v)</code>, let denote the change to <code>sum(a[1..i])</code> as <span class="math">\(\delta(i)\)</span></p>
+<ul>
+<li><span class="math">\(i &lt; L\)</span>, <span class="math">\(\delta(i) = 0 = 0 * i - 0\)</span></li>
+<li><span class="math">\(L \leq i \leq R\)</span>, <span class="math">\(\delta(i) = (i-L+1) * v = v * i - (L-1) * v\)</span></li>
+<li><span class="math">\(i &gt; R\)</span>, <span class="math">\(\delta(i) = (R-L+1) * v = 0 * i + R * v - (L-1) * v = 0 * i - ((L-1) * v - R * v)\)</span></li>
+</ul>
+<p>Note <span class="math">\(\delta(i) = b(i) * i - c(i)\)</span>. We can use 2 range update/point query BITs (the variation 1 above) to implement the range query and range update. The first BIT computes <span class="math">\(b(i)\)</span>:
+</p>
+<div class="math">$$
+b(i) = \left\{\begin{array}{ll}
+0 &amp; \text{if}~i &lt; L \\
+v &amp; \text{if}~L \leq i \leq R \\
+0 &amp; \text{otherwise}
+\end{array}\right.
+$$</div>
+<p>The second BIT computes <span class="math">\(c(i)\)</span>:
+</p>
+<div class="math">$$
+c(i) = \left\{\begin{array}{ll}
+0 &amp; \text{if}~i &lt; L \\
+(L-1)*v &amp; \text{if}~L \leq i \leq R \\
+(L-1)*v - R*v &amp; \text{otherwise}
+\end{array}\right.
+$$</div>
+<p><code>range_update(L,R,v)</code> can be implemented as:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># bit1</span>
+<span class="n">bit1</span><span class="o">.</span><span class="n">point_update</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">bit1</span><span class="o">.</span><span class="n">point_update</span><span class="p">(</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="n">v</span><span class="p">)</span>
+<span class="c1"># bit2</span>
+<span class="n">bit2</span><span class="o">.</span><span class="n">point_update</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="n">bit2</span><span class="o">.</span><span class="n">point_update</span><span class="p">(</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="n">R</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Also,
+<code>range_query(i) = bit1.query(i) * i - bit2.query(i)</code></p>
+<p>See also my <a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit_variants.cpp#L68">reference implementation</a> in C++ if you're interested.</p>
+<h1 id="2d-bit">2D BIT</h1>
+<p>Consider a 2D grid of size <span class="math">\(H \times W\)</span>, we want to support the following operations on the grid in <span class="math">\(O(\log H * \log W)\)</span> time:</p>
+<ul>
+<li><code>point_update(r,c,v)</code>: increase the <span class="math">\(g[r][c]\)</span> by <span class="math">\(v\)</span></li>
+<li><code>range_query(r1,r2,c1,c2)</code>: return sum of elements in <span class="math">\(g[r1..r2][c1..c2]\)</span>, <span class="math">\(r1 \leq r2, c1 \leq c2\)</span>.</li>
+</ul>
+<p>As you may expect, the <code>point_update</code> is a straightforward extension of the normal 1D BIT into 2D. The range query can be computed as:</p>
+<p><code>range_query(r1,r2,c1,c2) = range_query(1,r2,1,c2) - range_query(1,r2,1,c1-1) - range_query(1,r1-1,1,c2) + range_query(1,r1-1,1,c1-1)</code></p>
+<p>See also <a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit2d.cpp">my reference implementation</a> in C++.</p>
+<h1 id="inversion-counting">Inversion Counting</h1>
+<p><span class="math">\(a[1..n]\)</span> is a permutation of <span class="math">\(\{1,2...n\}\)</span>. An inversion is a pair <span class="math">\((i,j)\)</span>, <span class="math">\(1 \leq i &lt; j \leq n\)</span> such that <span class="math">\(a[i] &gt; a[j]\)</span>. Count the number of inversions in <span class="math">\(a[1..n]\)</span>.</p>
+<blockquote>
+<p>The key idea is use the values <span class="math">\(a[i]\)</span> as index in BIT.</p>
+</blockquote>
+<p>Below is an overly commented Python snippet:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">count_inversion</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+
+  <span class="o">//</span> <span class="n">initialize</span> <span class="n">a</span> <span class="n">BIT</span> <span class="n">of</span> <span class="n">size</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">):</span> <span class="n">bit</span>
+
+  <span class="n">inv_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="c1"># bit.query(x) returns how many values added so far, which are smaller than x.</span>
+    <span class="c1"># Thus i - bit.query(x) is the number of values added which are bigger than x.</span>
+    <span class="n">inv_cnt</span> <span class="o">+=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">bit</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="c1"># It&#39;s important to update after the query.</span>
+    <span class="n">bit</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">inv_cnt</span>
+</code></pre></div>
+
+
+<h1 id="order-statistic-tree">Order Statistic Tree</h1>
+<p>We need a set-like data structure, which supports the following operations:</p>
+<ul>
+<li><code>add(x)</code>: add <span class="math">\(x\)</span> to the set</li>
+<li><code>delete(x)</code>: remove <span class="math">\(x\)</span> from the set if existed</li>
+<li><code>order_of(x)</code>: count the number of elements in the set that are strictly less than <span class="math">\(x\)</span></li>
+<li><code>find_by_order(k)</code>: return the <span class="math">\(k^{th}\)</span> lowest element in the set</li>
+</ul>
+<p>Constraint: all updates <span class="math">\(x\)</span> are in the range <span class="math">\([1..N]\)</span> for some integer <span class="math">\(N\)</span>.</p>
+<p>Again, the trick here is to use the element value as index in BIT array, making use of the constraint that all element values are in the range <span class="math">\([1..N]\)</span>.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>

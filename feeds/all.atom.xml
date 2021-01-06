@@ -1,5 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2021-01-05T00:00:00+09:00</updated><entry><title>Binary Indexed Tree (Part 1)</title><link href="/binary-indexed-tree-part-1.html" rel="alternate"></link><published>2021-01-05T00:00:00+09:00</published><updated>2021-01-05T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-05:/binary-indexed-tree-part-1.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2021-01-06T00:00:00+09:00</updated><entry><title>Binary Indexed Tree (Part 2)</title><link href="/binary-indexed-tree-part-2.html" rel="alternate"></link><published>2021-01-06T00:00:00+09:00</published><updated>2021-01-06T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-06:/binary-indexed-tree-part-2.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Building on ideas from &lt;a href="https://ntduong.github.io/binary-indexed-tree-part-1.html"&gt;Part 1&lt;/a&gt;, in this part, we explore some lesser-known extensions and applications of BIT.&lt;/p&gt;
+&lt;p&gt;This is by no means a finished post, and I'll keep updating whenever I find new BIT applications/extensions.&lt;/p&gt;
+&lt;h1 id="variation-1-range-update-point-query"&gt;Variation 1: Range update, Point query&lt;/h1&gt;
+&lt;p&gt;We want the data structure, which …&lt;/p&gt;</summary><content type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Building on ideas from &lt;a href="https://ntduong.github.io/binary-indexed-tree-part-1.html"&gt;Part 1&lt;/a&gt;, in this part, we explore some lesser-known extensions and applications of BIT.&lt;/p&gt;
+&lt;p&gt;This is by no means a finished post, and I'll keep updating whenever I find new BIT applications/extensions.&lt;/p&gt;
+&lt;h1 id="variation-1-range-update-point-query"&gt;Variation 1: Range update, Point query&lt;/h1&gt;
+&lt;p&gt;We want the data structure, which supports the following operations on an input array &lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;range_update(L, R, v)&lt;/code&gt;: increase all &lt;span class="math"&gt;\(a[L..R]\)&lt;/span&gt; by &lt;span class="math"&gt;\(v\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point_query(i)&lt;/code&gt;: return the current &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Recall from Part 1, normal BIT only supports range prefix queries and point updates. How are we going to implement point query, range update with existing operations?&lt;/p&gt;
+&lt;p&gt;Consider the diff array &lt;code&gt;d[1..n]&lt;/code&gt;, &lt;code&gt;d[1] = a[1], d[i] = a[i]-a[i-1]&lt;/code&gt; for &lt;code&gt;i=2,...,n&lt;/code&gt;,
+&lt;code&gt;a[i] = d[i] + d[i-1] + ... + d[1]&lt;/code&gt; for &lt;code&gt;i=1,...,n&lt;/code&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key idea is to use the basic range query-point update BIT on the &lt;strong&gt;diff array &lt;span class="math"&gt;\(d[1..n]\)&lt;/span&gt;&lt;/strong&gt; instead of the original array &lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Clearly, &lt;code&gt;query(i)&lt;/code&gt; = &lt;code&gt;sum(d[1..i])&lt;/code&gt; = &lt;code&gt;a[i]&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now think about the range update &lt;code&gt;u(L,R,v)&lt;/code&gt;, &lt;span class="math"&gt;\(a[i] \leftarrow a[i]+v\)&lt;/span&gt; for all &lt;span class="math"&gt;\(L \leq i \leq R\)&lt;/span&gt;, how does the diff array change with the update?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No change to &lt;span class="math"&gt;\(d[i]\)&lt;/span&gt; for any &lt;span class="math"&gt;\(i &amp;lt; L\)&lt;/span&gt;, &lt;span class="math"&gt;\(L+1 \leq i \leq R\)&lt;/span&gt;, &lt;span class="math"&gt;\(R+1 &amp;lt; i\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(d[L] \leftarrow d[L] + v\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(d[R+1] \leftarrow d[R+1] - v\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thus we can achieve the range update &lt;code&gt;u(L,R,v)&lt;/code&gt; with two point updates:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;update(L,v)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;update(R+1,-v)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See also my &lt;a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit_variants.cpp#L18"&gt;reference implementation&lt;/a&gt; in C++ if you're interested.&lt;/p&gt;
+&lt;h1 id="variation-2-range-update-range-query"&gt;Variation 2: Range update, Range query&lt;/h1&gt;
+&lt;p&gt;We want the data structure, which supports the following operations on an input array &lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;range_update(L, R, v)&lt;/code&gt;: increase all &lt;span class="math"&gt;\(a[L..R]\)&lt;/span&gt; by &lt;span class="math"&gt;\(v\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;range_query(i)&lt;/code&gt;: return the prefix sum up to &lt;span class="math"&gt;\(i\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(\sum_{j=1}^i a[j]\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We've seen above how range update can be implemented. Let see how prefix range queries at different &lt;span class="math"&gt;\(i\)&lt;/span&gt;s change after a &lt;code&gt;range_update(L,R,v)&lt;/code&gt;, let denote the change to &lt;code&gt;sum(a[1..i])&lt;/code&gt; as &lt;span class="math"&gt;\(\delta(i)\)&lt;/span&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(i &amp;lt; L\)&lt;/span&gt;, &lt;span class="math"&gt;\(\delta(i) = 0 = 0 * i - 0\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(L \leq i \leq R\)&lt;/span&gt;, &lt;span class="math"&gt;\(\delta(i) = (i-L+1) * v = v * i - (L-1) * v\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(i &amp;gt; R\)&lt;/span&gt;, &lt;span class="math"&gt;\(\delta(i) = (R-L+1) * v = 0 * i + R * v - (L-1) * v = 0 * i - ((L-1) * v - R * v)\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note &lt;span class="math"&gt;\(\delta(i) = b(i) * i - c(i)\)&lt;/span&gt;. We can use 2 range update/point query BITs (the variation 1 above) to implement the range query and range update. The first BIT computes &lt;span class="math"&gt;\(b(i)\)&lt;/span&gt;:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+b(i) = \left\{\begin{array}{ll}
+0 &amp;amp; \text{if}~i &amp;lt; L \\
+v &amp;amp; \text{if}~L \leq i \leq R \\
+0 &amp;amp; \text{otherwise}
+\end{array}\right.
+$$&lt;/div&gt;
+&lt;p&gt;The second BIT computes &lt;span class="math"&gt;\(c(i)\)&lt;/span&gt;:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+c(i) = \left\{\begin{array}{ll}
+0 &amp;amp; \text{if}~i &amp;lt; L \\
+(L-1)*v &amp;amp; \text{if}~L \leq i \leq R \\
+(L-1)*v - R*v &amp;amp; \text{otherwise}
+\end{array}\right.
+$$&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;range_update(L,R,v)&lt;/code&gt; can be implemented as:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# bit1&lt;/span&gt;
+&lt;span class="n"&gt;bit1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;point_update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;bit1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;point_update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# bit2&lt;/span&gt;
+&lt;span class="n"&gt;bit2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;point_update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;bit2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;point_update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Also,
+&lt;code&gt;range_query(i) = bit1.query(i) * i - bit2.query(i)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;See also my &lt;a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit_variants.cpp#L68"&gt;reference implementation&lt;/a&gt; in C++ if you're interested.&lt;/p&gt;
+&lt;h1 id="2d-bit"&gt;2D BIT&lt;/h1&gt;
+&lt;p&gt;Consider a 2D grid of size &lt;span class="math"&gt;\(H \times W\)&lt;/span&gt;, we want to support the following operations on the grid in &lt;span class="math"&gt;\(O(\log H * \log W)\)&lt;/span&gt; time:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;point_update(r,c,v)&lt;/code&gt;: increase the &lt;span class="math"&gt;\(g[r][c]\)&lt;/span&gt; by &lt;span class="math"&gt;\(v\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;range_query(r1,r2,c1,c2)&lt;/code&gt;: return sum of elements in &lt;span class="math"&gt;\(g[r1..r2][c1..c2]\)&lt;/span&gt;, &lt;span class="math"&gt;\(r1 \leq r2, c1 \leq c2\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As you may expect, the &lt;code&gt;point_update&lt;/code&gt; is a straightforward extension of the normal 1D BIT into 2D. The range query can be computed as:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;range_query(r1,r2,c1,c2) = range_query(1,r2,1,c2) - range_query(1,r2,1,c1-1) - range_query(1,r1-1,1,c2) + range_query(1,r1-1,1,c1-1)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;See also &lt;a href="https://github.com/ntduong/Algorithms/blob/master/data_structures/range_queries/bit2d.cpp"&gt;my reference implementation&lt;/a&gt; in C++.&lt;/p&gt;
+&lt;h1 id="inversion-counting"&gt;Inversion Counting&lt;/h1&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt; is a permutation of &lt;span class="math"&gt;\(\{1,2...n\}\)&lt;/span&gt;. An inversion is a pair &lt;span class="math"&gt;\((i,j)\)&lt;/span&gt;, &lt;span class="math"&gt;\(1 \leq i &amp;lt; j \leq n\)&lt;/span&gt; such that &lt;span class="math"&gt;\(a[i] &amp;gt; a[j]\)&lt;/span&gt;. Count the number of inversions in &lt;span class="math"&gt;\(a[1..n]\)&lt;/span&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key idea is use the values &lt;span class="math"&gt;\(a[i]\)&lt;/span&gt; as index in BIT.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Below is an overly commented Python snippet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;count_inversion&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+
+  &lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="n"&gt;initialize&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;BIT&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="n"&gt;bit&lt;/span&gt;
+
+  &lt;span class="n"&gt;inv_cnt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+  &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c1"&gt;# bit.query(x) returns how many values added so far, which are smaller than x.&lt;/span&gt;
+    &lt;span class="c1"&gt;# Thus i - bit.query(x) is the number of values added which are bigger than x.&lt;/span&gt;
+    &lt;span class="n"&gt;inv_cnt&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# It&amp;#39;s important to update after the query.&lt;/span&gt;
+    &lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;inv_cnt&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1 id="order-statistic-tree"&gt;Order Statistic Tree&lt;/h1&gt;
+&lt;p&gt;We need a set-like data structure, which supports the following operations:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;add(x)&lt;/code&gt;: add &lt;span class="math"&gt;\(x\)&lt;/span&gt; to the set&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;delete(x)&lt;/code&gt;: remove &lt;span class="math"&gt;\(x\)&lt;/span&gt; from the set if existed&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;order_of(x)&lt;/code&gt;: count the number of elements in the set that are strictly less than &lt;span class="math"&gt;\(x\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;find_by_order(k)&lt;/code&gt;: return the &lt;span class="math"&gt;\(k^{th}\)&lt;/span&gt; lowest element in the set&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Constraint: all updates &lt;span class="math"&gt;\(x\)&lt;/span&gt; are in the range &lt;span class="math"&gt;\([1..N]\)&lt;/span&gt; for some integer &lt;span class="math"&gt;\(N\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Again, the trick here is to use the element value as index in BIT array, making use of the constraint that all element values are in the range &lt;span class="math"&gt;\([1..N]\)&lt;/span&gt;.&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Data structures"></category><category term="Algorithm"></category><category term="Fenwick tree"></category></entry><entry><title>Binary Indexed Tree (Part 1)</title><link href="/binary-indexed-tree-part-1.html" rel="alternate"></link><published>2021-01-05T00:00:00+09:00</published><updated>2021-01-05T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-05:/binary-indexed-tree-part-1.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a …&lt;/p&gt;</summary><content type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Binary indexed tree (BIT for short), aka &lt;a href="https://en.wikipedia.org/wiki/Fenwick_tree"&gt;Fenwick tree&lt;/a&gt;, is popular data structure in competitive programming (CP)context. I strongly believe it's also a valuable tool to add to software developers' practical toolbox. But is it worth yet another BIT tutorial? Yes as my aim is to provide a different/new perspective on the data structure, complementing many existing (good) tutorials that I've seen. In particular, in this two-part series,&lt;/p&gt;
 &lt;ul&gt;
