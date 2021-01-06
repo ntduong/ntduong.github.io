@@ -56,6 +56,7 @@
 <li>Part 2: Building on the core ideas from Part 1, suggest some flexible (and probably lesser-known) ways to extend the data structure to support more usecases, such as range-update/range-query and high-dimensional range queries.</li>
 </ul>
 <p>Last but not least, BIT is one of my all-time favorite data structure, and the underlying ideas are beautiful so I decided to write about it for my future self!</p>
+<p><strong>Update</strong>: I've added <a href="https://github.com/ntduong/Algorithms/tree/master/data_structures/range_queries">a reference C++ implementation</a> for both parts on Github. Feel free to take a look and ignore non-BIT code there!</p>
 <h2 id="what-is-bit-anyway">What is BIT anyway?</h2>
 <p>In short, BIT is a data structure, supporting efficient range queries on <strong>dynamic</strong> arrays, i.e., the array content can be updated along the way. More concretely, a standard BIT supports the following operations on an sized-<span class="math">\(n\)</span> array <span class="math">\(a[1..n]\)</span> in <span class="math">\(O(\log n)\)</span> time per op, with additional <span class="math">\(O(n)\)</span> space (for internal structure):</p>
 <ul>
