@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Wed, 06 Jan 2021 00:00:00 +0900</lastBuildDate><item><title>Binary Indexed Tree (Part 2)</title><link>/binary-indexed-tree-part-2.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+<rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Sat, 23 Jan 2021 00:00:00 +0900</lastBuildDate><item><title>Bellman-Ford and systems of difference constraints</title><link>/bellman-ford-and-systems-of-difference-constraints.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Bellman-Ford is an algorithm for find shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Sat, 23 Jan 2021 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2021-01-23:/bellman-ford-and-systems-of-difference-constraints.html</guid><category>Algorithm</category><category>graph</category><category>linear programming</category></item><item><title>Binary Indexed Tree (Part 2)</title><link>/binary-indexed-tree-part-2.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Building on ideas from &lt;a href="https://ntduong.github.io/binary-indexed-tree-part-1.html"&gt;Part 1&lt;/a&gt;, in this part, we explore some lesser-known extensions and applications of BIT.&lt;/p&gt;
 &lt;p&gt;This is by no means a finished post, and I'll keep updating whenever I find new BIT applications/extensions.&lt;/p&gt;
 &lt;h1 id="variation-1-range-update-point-query"&gt;Variation 1: Range update, Point query&lt;/h1&gt;

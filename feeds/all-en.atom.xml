@@ -1,5 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all-en.atom.xml" rel="self"></link><id>/</id><updated>2021-01-06T00:00:00+09:00</updated><entry><title>Binary Indexed Tree (Part 2)</title><link href="/binary-indexed-tree-part-2.html" rel="alternate"></link><published>2021-01-06T00:00:00+09:00</published><updated>2021-01-06T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-06:/binary-indexed-tree-part-2.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all-en.atom.xml" rel="self"></link><id>/</id><updated>2021-01-23T00:00:00+09:00</updated><entry><title>Bellman-Ford and systems of difference constraints</title><link href="/bellman-ford-and-systems-of-difference-constraints.html" rel="alternate"></link><published>2021-01-23T00:00:00+09:00</published><updated>2021-01-23T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-23:/bellman-ford-and-systems-of-difference-constraints.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Bellman-Ford is an algorithm for find shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><content type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Bellman-Ford is an algorithm for find shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E|)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;This post is, however, about a lesser-known application of the algorithm, namely solving a system of difference constraints of &lt;span class="math"&gt;\(n\)&lt;/span&gt; variables &lt;span class="math"&gt;\(\{x_i\}_{i=1}^n\)&lt;/span&gt; and &lt;span class="math"&gt;\(m\)&lt;/span&gt; constraints of the form: &lt;span class="math"&gt;\(x_j - x_i \leq w_{ij}\)&lt;/span&gt;, in &lt;span class="math"&gt;\(O(m*n)\)&lt;/span&gt; time complexity.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Note that this problem can be formulated as &lt;span class="math"&gt;\(A x \leq w\)&lt;/span&gt;, in which &lt;span class="math"&gt;\(x\)&lt;/span&gt; is the &lt;span class="math"&gt;\(n\)&lt;/span&gt;-vector of &lt;span class="math"&gt;\(\{x_1,...x_n\}\)&lt;/span&gt;, &lt;span class="math"&gt;\(w\)&lt;/span&gt; is the &lt;span class="math"&gt;\(m\)&lt;/span&gt;-vector of corresponding constraints, &lt;span class="math"&gt;\(A\)&lt;/span&gt; is a &lt;span class="math"&gt;\(m \times n\)&lt;/span&gt; matrix such that each row contains exactly one 1 and one -1 and 0 otherwise. We need to either find &lt;span class="math"&gt;\(x\)&lt;/span&gt; satisfies the inequality, or report that no solution exists, i.e., the constraints are unsatisfiable!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Wait a minute, I want a real-world problem, not a toy, theoretical one! Sure, you can find systems of difference constraints in many practical problems. For example, consider task scheduling with precedence constraints, in which we have &lt;span class="math"&gt;\(n\)&lt;/span&gt; tasks,
+- &lt;span class="math"&gt;\(x_i\)&lt;/span&gt; is the starting time of the &lt;span class="math"&gt;\(i^{th}\)&lt;/span&gt; task
+- constraints: a task &lt;span class="math"&gt;\(i\)&lt;/span&gt; needs to be finished before starting a task &lt;span class="math"&gt;\(j\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(x_i + \text{duration}(i)\leq x_j \Rightarrow x_i - x_j \leq -\text{duration}(u)\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Also, it turns out we can find a solution that minimizes the spread of time of all tasks &lt;span class="math"&gt;\(\max_i x_i - \min_i x_i\)&lt;/span&gt; with the algorithm described below. &lt;/p&gt;
+&lt;p&gt;Another example is in VLSI layout design, making chip layout as compact as possible while keeping required distances between components for reasonable performance.&lt;/p&gt;
+&lt;p&gt;Convinced? So let's dive in!&lt;/p&gt;
+&lt;h1 id="observation"&gt;Observation&lt;/h1&gt;
+&lt;p&gt;Following are key observations, which suggest surprising connection between the shortest-path problem and the system of difference constraints:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(x_j - x_i \leq w_{ij} \Rightarrow x_j \leq x_i + w_{ij}\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;recall the relaxation often used in the shortest-path problem, &lt;span class="math"&gt;\(d_i, d_j\)&lt;/span&gt; are the shortest path from the source &lt;span class="math"&gt;\(s\)&lt;/span&gt; to vertices &lt;span class="math"&gt;\(i, j\)&lt;/span&gt; respectively, &lt;span class="math"&gt;\(w_{ij}\)&lt;/span&gt; is the weight of edge &lt;span class="math"&gt;\(i \rightarrow j\)&lt;/span&gt; (assume existed), then &lt;span class="math"&gt;\(d_j \leq d_i + w_{ij}\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="constraint-graph"&gt;Constraint graph&lt;/h2&gt;
+&lt;p&gt;Let's convert the system of difference constraints into a graph:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(n\)&lt;/span&gt; vertices corresponding to &lt;span class="math"&gt;\(n\)&lt;/span&gt; variables &lt;span class="math"&gt;\(\{x_i\}_{i=1}^n\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;for each constraint &lt;span class="math"&gt;\(x_j - x_i \leq w_{ij}\)&lt;/span&gt;, add an edge &lt;span class="math"&gt;\(i \rightarrow j\)&lt;/span&gt; with weight &lt;span class="math"&gt;\(w_{ij}\)&lt;/span&gt;. There are &lt;span class="math"&gt;\(m\)&lt;/span&gt; edges in total.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The resulting graph is the constraint graph corresponding to the original system of difference constraints.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Claim 1&lt;/strong&gt;: If there exists a negative cycle in the constraint graph, then the original system is unsatisfiable&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Assume there exists a solution to the original system and a negative cycle &lt;span class="math"&gt;\(x_1 \rightarrow x_2 \rightarrow ... \rightarrow x_k \rightarrow x_1\)&lt;/span&gt;, i.e.,
+&lt;span class="math"&gt;\(w_{12} + ... + w_{k1} &amp;lt; 0\)&lt;/span&gt;. However, &lt;span class="math"&gt;\(w_{12} + ... + w_{k1} = x_2 - x_1 + ... + x_1-x_k = 0\)&lt;/span&gt;. This is contradiction, hence Claim 1 is proved.&lt;/p&gt;
+&lt;p&gt;Here comes Bellman Ford algorithm, helping us detect if any negative cycle in the constraint graph. If there is, then Claim 1 tells us that the system is unsatisfiable. &lt;/p&gt;
+&lt;h2 id="extend-the-constraint-graph"&gt;Extend the constraint graph&lt;/h2&gt;
+&lt;p&gt;Here we assume no negative cycle in the constraint graph (judged by Bellman Ford algorithm), then how can we find a solution to the constraint system? &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key idea is to add a new vertex &lt;span class="math"&gt;\(s\)&lt;/span&gt; to the constraint graph and &lt;span class="math"&gt;\(n\)&lt;/span&gt; edges of &lt;strong&gt;weight 0&lt;/strong&gt; from &lt;span class="math"&gt;\(s\)&lt;/span&gt; to all existing vertices. &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Adding weight-0 edges to the graph doesn't introduce any negative cycle, and guarantee there are shortest paths from &lt;span class="math"&gt;\(s\)&lt;/span&gt; to all &lt;span class="math"&gt;\(n\)&lt;/span&gt; vertices &lt;span class="math"&gt;\(\{x_i\}_{i=1}^n\)&lt;/span&gt;. Let &lt;span class="math"&gt;\(\{d_i\}_{i=1}^n\)&lt;/span&gt; denote the corresponding shortest distances. &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Claim 2: &lt;span class="math"&gt;\(\{d_i\}_{i=1}^n\)&lt;/span&gt; satisfies the difference constraints, and thus is a solution of the original system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This is mostly obvious given the triangle inequality (aka relaxation constraint) &lt;span class="math"&gt;\(d_j \leq d_i + w_{ij}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;h1 id="algorithm"&gt;Algorithm&lt;/h1&gt;
+&lt;p&gt;To solve a difference constraint system, we can just:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Construct the corresponding constraint graph, extended with a source vertex &lt;span class="math"&gt;\(s\)&lt;/span&gt; (as mentioned above)&lt;/li&gt;
+&lt;li&gt;Then run Bellman-Ford on the resulting graph to obtain shortest distances from &lt;span class="math"&gt;\(s\)&lt;/span&gt; to the remaining vertices&lt;/li&gt;
+&lt;li&gt;If a negative cycle is detected, report no solution&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The time complexity of this algorithm is &lt;span class="math"&gt;\(O(m*n)\)&lt;/span&gt;, thanks to the Bellman-Ford algorithm. &lt;/p&gt;
+&lt;h2 id="implementation"&gt;Implementation&lt;/h2&gt;
+&lt;p&gt;See my &lt;a href="https://github.com/ntduong/Algorithms/blob/master/graph/bf1.cpp"&gt;simple implementation&lt;/a&gt; of the Bellman-Ford algorithm.&lt;/p&gt;
+&lt;h2 id="remark"&gt;Remark&lt;/h2&gt;
+&lt;p&gt;There are cool properties of the solution found by the Bellman-Ford algorithm, which are worth mentioning:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;minimizes&lt;/strong&gt; &lt;span class="math"&gt;\(\max_i x_i - \min_i x_i\)&lt;/span&gt;, i.e., it minimizes the &lt;em&gt;spread&lt;/em&gt; of the solution. This is useful, for example, consider the task scheduling problem at the begining. The algorithm essentially minimizes the time to complete all tasks while satisfying all scheduling constraints.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;maximize &lt;span class="math"&gt;\(\sum_{i=1}^n x_i\)&lt;/span&gt;&lt;/strong&gt; given addition constraints that &lt;span class="math"&gt;\(x_i \leq 0\)&lt;/span&gt; for all &lt;span class="math"&gt;\(i\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="further-reading"&gt;Further reading&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="https://courses.csail.mit.edu/6.006/spring11/lectures/lec17.pdf"&gt;MIT lecture notes&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Algorithm"></category><category term="graph"></category><category term="linear programming"></category></entry><entry><title>Binary Indexed Tree (Part 2)</title><link href="/binary-indexed-tree-part-2.html" rel="alternate"></link><published>2021-01-06T00:00:00+09:00</published><updated>2021-01-06T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-06:/binary-indexed-tree-part-2.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Building on ideas from &lt;a href="https://ntduong.github.io/binary-indexed-tree-part-1.html"&gt;Part 1&lt;/a&gt;, in this part, we explore some lesser-known extensions and applications of BIT.&lt;/p&gt;
 &lt;p&gt;This is by no means a finished post, and I'll keep updating whenever I find new BIT applications/extensions.&lt;/p&gt;
 &lt;h1 id="variation-1-range-update-point-query"&gt;Variation 1: Range update, Point query&lt;/h1&gt;
