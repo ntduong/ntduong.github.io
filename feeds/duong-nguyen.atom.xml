@@ -67,9 +67,11 @@
 &lt;ul&gt;
 &lt;li&gt;Note that this problem can be formulated as &lt;span class="math"&gt;\(A x \leq w\)&lt;/span&gt;, in which &lt;span class="math"&gt;\(x\)&lt;/span&gt; is the &lt;span class="math"&gt;\(n\)&lt;/span&gt;-vector of &lt;span class="math"&gt;\(\{x_1,...x_n\}\)&lt;/span&gt;, &lt;span class="math"&gt;\(w\)&lt;/span&gt; is the &lt;span class="math"&gt;\(m\)&lt;/span&gt;-vector of corresponding constraints, &lt;span class="math"&gt;\(A\)&lt;/span&gt; is a &lt;span class="math"&gt;\(m \times n\)&lt;/span&gt; matrix such that each row contains exactly one 1 and one -1 and 0 otherwise. We need to either find &lt;span class="math"&gt;\(x\)&lt;/span&gt; satisfies the inequality, or report that no solution exists, i.e., the constraints are unsatisfiable!&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Wait a minute, I want a real-world problem, not a toy, theoretical one! Sure, you can find systems of difference constraints in many practical problems. For example, consider task scheduling with precedence constraints, in which we have &lt;span class="math"&gt;\(n\)&lt;/span&gt; tasks,
-- &lt;span class="math"&gt;\(x_i\)&lt;/span&gt; is the starting time of the &lt;span class="math"&gt;\(i^{th}\)&lt;/span&gt; task
-- constraints: a task &lt;span class="math"&gt;\(i\)&lt;/span&gt; needs to be finished before starting a task &lt;span class="math"&gt;\(j\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(x_i + \text{duration}(i)\leq x_j \Rightarrow x_i - x_j \leq -\text{duration}(u)\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Wait a minute, I want a real-world problem, not a toy, theoretical one! Sure, you can find systems of difference constraints in many practical problems. For example, consider task scheduling with precedence constraints, in which we have &lt;span class="math"&gt;\(n\)&lt;/span&gt; tasks,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(x_i\)&lt;/span&gt; is the starting time of the &lt;span class="math"&gt;\(i^{th}\)&lt;/span&gt; task&lt;/li&gt;
+&lt;li&gt;constraints: a task &lt;span class="math"&gt;\(i\)&lt;/span&gt; needs to be finished before starting a task &lt;span class="math"&gt;\(j\)&lt;/span&gt;, i.e., &lt;span class="math"&gt;\(x_i + \text{duration}(i)\leq x_j \Rightarrow x_i - x_j \leq -\text{duration}(u)\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;Also, it turns out we can find a solution that minimizes the spread of time of all tasks &lt;span class="math"&gt;\(\max_i x_i - \min_i x_i\)&lt;/span&gt; with the algorithm described below. &lt;/p&gt;
 &lt;p&gt;Another example is in VLSI layout design, making chip layout as compact as possible while keeping required distances between components for reasonable performance.&lt;/p&gt;
 &lt;p&gt;Convinced? So let's dive in!&lt;/p&gt;

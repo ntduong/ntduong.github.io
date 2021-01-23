@@ -55,9 +55,11 @@
 <ul>
 <li>Note that this problem can be formulated as <span class="math">\(A x \leq w\)</span>, in which <span class="math">\(x\)</span> is the <span class="math">\(n\)</span>-vector of <span class="math">\(\{x_1,...x_n\}\)</span>, <span class="math">\(w\)</span> is the <span class="math">\(m\)</span>-vector of corresponding constraints, <span class="math">\(A\)</span> is a <span class="math">\(m \times n\)</span> matrix such that each row contains exactly one 1 and one -1 and 0 otherwise. We need to either find <span class="math">\(x\)</span> satisfies the inequality, or report that no solution exists, i.e., the constraints are unsatisfiable!</li>
 </ul>
-<p>Wait a minute, I want a real-world problem, not a toy, theoretical one! Sure, you can find systems of difference constraints in many practical problems. For example, consider task scheduling with precedence constraints, in which we have <span class="math">\(n\)</span> tasks,
-- <span class="math">\(x_i\)</span> is the starting time of the <span class="math">\(i^{th}\)</span> task
-- constraints: a task <span class="math">\(i\)</span> needs to be finished before starting a task <span class="math">\(j\)</span>, i.e., <span class="math">\(x_i + \text{duration}(i)\leq x_j \Rightarrow x_i - x_j \leq -\text{duration}(u)\)</span></p>
+<p>Wait a minute, I want a real-world problem, not a toy, theoretical one! Sure, you can find systems of difference constraints in many practical problems. For example, consider task scheduling with precedence constraints, in which we have <span class="math">\(n\)</span> tasks,</p>
+<ul>
+<li><span class="math">\(x_i\)</span> is the starting time of the <span class="math">\(i^{th}\)</span> task</li>
+<li>constraints: a task <span class="math">\(i\)</span> needs to be finished before starting a task <span class="math">\(j\)</span>, i.e., <span class="math">\(x_i + \text{duration}(i)\leq x_j \Rightarrow x_i - x_j \leq -\text{duration}(u)\)</span></li>
+</ul>
 <p>Also, it turns out we can find a solution that minimizes the spread of time of all tasks <span class="math">\(\max_i x_i - \min_i x_i\)</span> with the algorithm described below. </p>
 <p>Another example is in VLSI layout design, making chip layout as compact as possible while keeping required distances between components for reasonable performance.</p>
 <p>Convinced? So let's dive in!</p>
