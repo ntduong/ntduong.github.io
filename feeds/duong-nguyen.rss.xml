@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Sat, 23 Jan 2021 00:00:00 +0900</lastBuildDate><item><title>Bellman-Ford and systems of difference constraints</title><link>/bellman-ford-and-systems-of-difference-constraints.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
-&lt;p&gt;Bellman-Ford is an algorithm for find shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;p&gt;Bellman-Ford is an algorithm for finding shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
         linebreak = "false";
