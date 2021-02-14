@@ -1,5 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all-en.atom.xml" rel="self"></link><id>/</id><updated>2021-01-23T00:00:00+09:00</updated><entry><title>Bellman-Ford and systems of difference constraints</title><link href="/bellman-ford-and-systems-of-difference-constraints.html" rel="alternate"></link><published>2021-01-23T00:00:00+09:00</published><updated>2021-01-23T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-23:/bellman-ford-and-systems-of-difference-constraints.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Notes</title><link href="/" rel="alternate"></link><link href="/feeds/all-en.atom.xml" rel="self"></link><id>/</id><updated>2021-02-14T00:00:00+09:00</updated><entry><title>An opinionated case against A/B testing: Exploration-vs-Exploitation</title><link href="/an-opinionated-case-against-ab-testing-exploration-vs-exploitation.html" rel="alternate"></link><published>2021-02-14T00:00:00+09:00</published><updated>2021-02-14T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-02-14:/an-opinionated-case-against-ab-testing-exploration-vs-exploitation.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Nowadays, a lot of companies (esp. tech companies) have been embracing data-driven decision making practice. Almost every business decision such as &lt;em&gt;what background color should be used for the company website&lt;/em&gt; or &lt;em&gt;whether a new kitty photo filter should be released&lt;/em&gt; requires justification with some performance metrics. A/B …&lt;/p&gt;</summary><content type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+&lt;p&gt;Nowadays, a lot of companies (esp. tech companies) have been embracing data-driven decision making practice. Almost every business decision such as &lt;em&gt;what background color should be used for the company website&lt;/em&gt; or &lt;em&gt;whether a new kitty photo filter should be released&lt;/em&gt; requires justification with some performance metrics. A/B testing has become a de facto tool for trying out and &lt;strong&gt;comparing&lt;/strong&gt; multiple ideas/solutions (aka, &lt;em&gt;arms&lt;/em&gt;, &lt;em&gt;options&lt;/em&gt;) simultaneously, often &lt;strong&gt;on production user traffic&lt;/strong&gt;, such as user requests. In business, A/B testing is a general term referring to the practice of conducting randomized controlled trials (aka, &lt;em&gt;experiment&lt;/em&gt;) on real/production users. &lt;/p&gt;
+&lt;h2 id="a-simple-ab-test"&gt;A simple A/B test&lt;/h2&gt;
+&lt;p&gt;Let's consider an oversimplified A/B test on a company homepage background color, in which we want to decice which color, &lt;em&gt;red&lt;/em&gt; or &lt;em&gt;blue&lt;/em&gt; should be used. Say the CEO agrees to give me 20% of website traffic to experiment on for 1 month. I then get a fair coin with 50% chance of turning up head/tail. Whenever a user request comes, I flip the coin, if it's head then the user gets to see &lt;em&gt;red&lt;/em&gt;; otherwise the user gets to see &lt;em&gt;blue&lt;/em&gt;. This process applies up to 20% traffic at a time. I also need to decide key performance metrics to be measured on experimental traffic. Let's pretend for a user comes to the website, I want to measure their engagement/happiness with the background color in terms of the duration they stay on the site (in minutes); the longer the happier the better. After 1 month, I compare the average happiness scores of the red and blue groups and turns out the red group has the higher score. I draw conclusion that red is better and propose red color to the CEO (final decision maker). That's it, a simple yet typical example of an A/B test.&lt;/p&gt;
+&lt;h2 id="more-boring-details"&gt;More (boring) details&lt;/h2&gt;
+&lt;p&gt;A typical A/B test usually includes a single baseline (aka &lt;strong&gt;Control group&lt;/strong&gt;) and 1 or more experimental arms (aka &lt;strong&gt;Treatment groups&lt;/strong&gt;).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Treatment arms and Control represent different options we'd like to try out and compare; but other than that they are under kept similar (hence, &lt;em&gt;controlled&lt;/em&gt;). A treatment arm is usually compared against the Control and/or other treatment arms, in terms of key performance metrics.&lt;/li&gt;
+&lt;li&gt;What metrics should be used depend on specific business problems, such as click-through-rate (CTR) on ads banner, user visit rate on website etc.&lt;/li&gt;
+&lt;li&gt;How much traffic should be used: usually companies can't afford running experiments on large production traffic (except when they are inevitably neccessary); lest a significant part of users will be treated weird/sub-optimal experience (ahem, it's an experimental feature anyway!). It's crucial to have a &lt;strong&gt;representative&lt;/strong&gt; traffic for experiment; since we want to draw business insights/conclusion from the experimental traffic and extrapolate to full production user traffic.&lt;/li&gt;
+&lt;li&gt;How long should a A/B test run? It again depends on specific problems and domains, but short to medium-term (up to 1 month) experiments are very common.&lt;/li&gt;
+&lt;li&gt;Experiment sizing (how much traffic, how long to run) is critical to the success of a test. The sizing needs to be done carefully with statistical rigor before starting the test. Once it's decided, it should be kept until the end; modifying these midway essentially invalidate the experiment results (e.g., some p-hacking tricks like extending test duration or increase traffic midway are unacceptable!)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A/B testing isn't new or exotic tool at all, in fact a lot of A/B tests (aka, &lt;strong&gt;experiment&lt;/strong&gt;) have been conducted daily by e.g., scientists, for drug testing, discovering new materials, chemical substances, new vaccinces, testing new medical treatments etc. With all due respect to the rigorous science of A/B testing, I believe it's pretty solid and reasonable tool for decision making. &lt;/p&gt;
+&lt;p&gt;In this post, however &lt;strong&gt;I want to make a case agains A/B testing, that it is NOT a silver bullet, and may not work well in many practical scenarios&lt;/strong&gt;.&lt;/p&gt;
+&lt;h1 id="when-ab-testing-fails"&gt;When A/B testing fails&lt;/h1&gt;
+&lt;p&gt;Let's revisit the &lt;em&gt;simple&lt;/em&gt; red-or-blue example above. You may notice some naivety in my conclusion that red is better color. With just 1 month of data, how dare are you to conclude that red is better than blue? Turns out the experiment was running in the Christmas season and people seemed to prefer red (who doesn't like red-and-white Santa Claus with big presents :)), and somehow people seeing red stayed on the website longer, and tilted my happiness metric into red's favor. Sadly, soon after the Christmas season was over, the traffic to the red homepage went down drastically and many users voiced their concern/disastifaction with the red color! &lt;/p&gt;
+&lt;p&gt;So you see the first flaw with short/mid-term A/B test: &lt;em&gt;some counfounding factors (out of experimenter's control?) can corrupt the performance metrics and lead to wrong conclusion, in hindsight&lt;/em&gt;. &lt;/p&gt;
+&lt;p&gt;As a diehard A/B tester, I argue what if I was allowed to run the experiment for longer, say a full year, I'd surely figure out the best color. No way I can get approval for that given the clear risk of losing out users. But even if I can run the experiment for that long, I may end up observing no significant difference between red and blue in key metrics. How come? Turns out &lt;strong&gt;in hindsight again&lt;/strong&gt;, people prefer red during winter and fall; and blue during autumn and summer. Another possible scenario is user base shift over time, when the experiment starts, more users prefer red over blue, but somehow during the year, more blue users come and red users leave. So averaging over the whole year, blue and red are comparable, each has its own good and bad periods. Just by observing the results in the end, no conclusion can be draw on what color is better.&lt;/p&gt;
+&lt;h2 id="the-key-assumption-of-ab-testing"&gt;The key assumption of A/B testing&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key underlying assumption of A/B testing is that there is a single winner, applicable to all user traffic over long time.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;When this assumption holds, A/B testing works really well and help us figure out the clear winner quickly. But how often does this assumption hold true in practice? Many real-world interesting/critical problems don't have a single clear winner solution for all users, not to mention over long time. It's arguably more often that we're in the situation when different user groups prefer different solutions and working solutions shift over time. &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In other words, multiple solutions should co-exist and serve their own user base over time!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Even when A/B testing works well (and there exists a single clear winner), it still has an critical drawback; that is &lt;strong&gt;during experimental phase, a significant part of users are exposed to sub-optimal solutions&lt;/strong&gt;; since A/B testing usually divides up traffic into equal groups, and only one group gets the winner treatment.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This situation incurs &lt;strong&gt;regret&lt;/strong&gt;, loss of opportunity for the experiment runner (failed to deliver best experience to users) and sub-optimial experience hurts users and may turn them away from the business.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So what are alternatives to A/B testing when it failed? Actually to be fair, the problem with A/B testing is more about how we interpret and make decision based on the experiment results; not the experiment itself (experimentation is good!). It's often that after a short period of exploring multiple options equally, a single option is selected to be the winner and then to be deployed to all traffic.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's &lt;strong&gt;explore-then-exploit&lt;/strong&gt; (aka, explore-then-commit) strategy, nothing more!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The problem is that we commit (too soon) to a single solution over long term for all users; which is usually sub-optimal. Thus, a natural alternative is to keep all options &lt;strong&gt;proportionally to how good individual options are&lt;/strong&gt;, i.e., keep good balance between exploration and exploitation!&lt;/p&gt;
+&lt;h1 id="explore-vs-exploit"&gt;Explore vs Exploit&lt;/h1&gt;
+&lt;p&gt;The exploration-vs-exploitation tradeoff is at the core of sequential decision making. In order to perform well over a long run, it's critical to juggle exploration and exploitation effectively. We need a flexible strategy which can adapt to the dynamics of the environment in which the strategy operates on. Too abstract? Let's revisit the red-or-blue problem, instead of committing to red after the experiment, what if we keep serving both red and blue; but with &lt;strong&gt;a catch&lt;/strong&gt;: the corresponding traffic should be proportional to how good a color currently performs, i.e., when red is doing better (based on user happiness metric), we should allocate more traffic to red than blue; and vice versa (when blue is doing better). &lt;strong&gt;The key here is the traffic for each option is scaled dynamically over time according to user preference&lt;/strong&gt;; the better a color performs, the higher traffic it receives. This sounds too good to be true; how can we do this? One popular approach to situations involving explore-vs-exploit across multiple options is the so-called &lt;a href="https://en.wikipedia.org/wiki/Multi-armed_bandit"&gt;&lt;strong&gt;multi-armed bandits&lt;/strong&gt;&lt;/a&gt;, which is a family of algorithms for decision making with strong theoretical support and empirical successes. Multi-armed bandits are a key ingredient in a lot of successful real-world applications, such as Netflix art work recommendation, website optimization, ads optimization. A detailed treatment of multi-armed bandits algorithms is obviously out of scope of this post; please refer to the References section for good resource on the topic.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key point to remember here is that multi-armed bandits allow for continuously exploring multiple options while exploiting best performers at a time. The exploration is proportional to individual options' performance.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Astute readers may wonder how to incorporate contextual information, such as user profile into the decision making here in addition to solely relying on performance metrics. Yes, &lt;strong&gt;contextual bandits&lt;/strong&gt; is an algorithm in the multi-armed bandits family, taking into account contextual information when determining which option to take at a time for a particular context. For example, for a user with strong preference and watch history of anime, the algorithm should probably explore anime for this user, even though anime genre doesn't perform as well as other genres (like romantic drama) at the time.&lt;/p&gt;
+&lt;p&gt;So should we abandon A/B testing for multi-armed bandits? It likely depends on your specific problems.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A/B testing enables decision making based on short-term experiments; with &lt;code&gt;explore equally-then-commit&lt;/code&gt; strategy&lt;/li&gt;
+&lt;li&gt;OTOH, multi-armed bandits is always-on, continuously running experiment, in which multiple options are explored proportionally and best options at a time are exploited accordingly; essentionally &lt;code&gt;explore-vs-exploit&lt;/code&gt; juggling strategy. It sounds like a great strategy but comes with a cost for the balancing act. Devising good explore-vs-exploit balancing strategy in general is still an active research problem&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="middle-ground-proposal"&gt;Middle ground Proposal&lt;/h1&gt;
+&lt;p&gt;Despite its limitation, A/B testing remains a widely adopted practice thanks to its working well and comparatively low cost (vs. multi-armed bandits) in practice. To end this long post, I want to propose some middle ground approach, taking into account the explore-vs-exploit trade-off.&lt;/p&gt;
+&lt;h2 id="proposal-1-continuously-experiment-and-reevaluate-the-status-quo-to-search-for-the-better"&gt;Proposal 1: Continuously experiment and reevaluate the status-quo to search for the better&lt;/h2&gt;
+&lt;p&gt;Committing to a single winner in short-term is reasonable; it's like accepting your local optimum with low cost. However, we should avoid sticking to a single winner for too long. Instead, a good strategy is to continuously run short A/B tests to reevaluate the status-quo and promote new better options when appropriate.&lt;/p&gt;
+&lt;h2 id="proposal-2-incorporate-simple-exploration-strategy-in-addition-to-exploiting-the-current-best-option"&gt;Proposal 2: Incorporate simple exploration strategy in addition to exploiting the current best option&lt;/h2&gt;
+&lt;p&gt;Consider adopting simple exploration strategy from multi-armed bandits literature:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\epsilon\)&lt;/span&gt;-greedy: While commiting to the current best solution most of the time; we should set aside a small budget for random exploration, say for 5% of the time serving a &lt;code&gt;not-the-current-best&lt;/code&gt; solution&lt;/li&gt;
+&lt;li&gt;Upper confidence bound (UCB): Explore an option proportionally to how much we know about its performance. Intuitively, the less we know about an option, the higher potential value it can bring (to our surprise); so we should try it more. Reversely, as we know more about an option, we may reduce its frequency. &lt;code&gt;Essentially, explore to reduce the entropy&lt;/code&gt;!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="references"&gt;References&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="https://www.oreilly.com/library/view/bandit-algorithms-for/9781449341565/"&gt;Bandits Algorithms for Website Optimization&lt;/a&gt;: a old yet good enough introductory book on basic bandits algorithms.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.cambridge.org/core/books/bandit-algorithms/8E39FD004E6CE036680F90DD0C6F09FC"&gt;Bandits Algorithms&lt;/a&gt;: an excellent book with rigorous theoretical treatment of bandits algorithms by Tor Lattimore and Csaba Szepesvári.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Decision Making"></category><category term="experiment"></category><category term="A/B test"></category><category term="multi-armed bandits"></category><category term="exploration"></category><category term="exploitation"></category></entry><entry><title>Bellman-Ford and systems of difference constraints</title><link href="/bellman-ford-and-systems-of-difference-constraints.html" rel="alternate"></link><published>2021-01-23T00:00:00+09:00</published><updated>2021-01-23T00:00:00+09:00</updated><author><name>Duong Nguyen</name></author><id>tag:None,2021-01-23:/bellman-ford-and-systems-of-difference-constraints.html</id><summary type="html">&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Bellman-Ford is an algorithm for finding shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
