@@ -54,8 +54,8 @@
 &lt;p&gt;Astute readers may wonder how to incorporate contextual information, such as user profile into the decision making here in addition to solely relying on performance metrics. Yes, &lt;strong&gt;contextual bandits&lt;/strong&gt; is an algorithm in the multi-armed bandits family, taking into account contextual information when determining which option to take at a time for a particular context. For example, for a user with strong preference and watch history of anime, the algorithm should probably explore anime for this user, even though anime genre doesn't perform as well as other genres (like romantic drama) at the time.&lt;/p&gt;
 &lt;p&gt;So should we abandon A/B testing for multi-armed bandits? It likely depends on your specific problems.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;A/B testing enables decision making based on short-term experiments; with &lt;code&gt;explore equally-then-commit&lt;/code&gt; strategy&lt;/li&gt;
-&lt;li&gt;OTOH, multi-armed bandits is always-on, continuously running experiment, in which multiple options are explored proportionally and best options at a time are exploited accordingly; essentionally &lt;code&gt;explore-vs-exploit&lt;/code&gt; juggling strategy. It sounds like a great strategy but comes with a cost for the balancing act. Devising good explore-vs-exploit balancing strategy in general is still an active research problem&lt;/li&gt;
+&lt;li&gt;A/B testing enables decision making based on short-term experiments; with &lt;strong&gt;explore equally-then-commit&lt;/strong&gt; strategy&lt;/li&gt;
+&lt;li&gt;OTOH, multi-armed bandits is always-on, continuously running experiment, in which multiple options are explored proportionally and best options at a time are exploited accordingly; essentionally &lt;strong&gt;explore-vs-exploit&lt;/strong&gt; juggling strategy. It sounds like a great strategy but comes with a cost for the balancing act. Devising good explore-vs-exploit balancing strategy in general is still an active research problem&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h1 id="middle-ground-proposal"&gt;Middle ground Proposal&lt;/h1&gt;
 &lt;p&gt;Despite its limitation, A/B testing remains a widely adopted practice thanks to its working well at relatively low cost (vs. multi-armed bandits) in practice. To end this long post, I want to propose some middle ground approach, taking into account the explore-vs-exploit trade-off.&lt;/p&gt;
@@ -64,8 +64,8 @@
 &lt;h2 id="proposal-2-incorporate-simple-exploration-strategy-in-addition-to-exploiting-the-current-best-option"&gt;Proposal 2: Incorporate simple exploration strategy in addition to exploiting the current best option&lt;/h2&gt;
 &lt;p&gt;Consider adopting simple exploration strategy from multi-armed bandits literature:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;span class="math"&gt;\(\epsilon\)&lt;/span&gt;-greedy: While commiting to the current best solution most of the time; we should set aside a small budget for random exploration, say for 5% of the time serving a &lt;code&gt;not-the-current-best&lt;/code&gt; solution&lt;/li&gt;
-&lt;li&gt;Upper confidence bound (UCB): Explore an option proportionally to how much we know about its performance. Intuitively, the less we know about an option, the higher potential value it can bring (to our surprise); so we should try it more. Reversely, as we know more about an option, we may reduce its frequency. &lt;code&gt;Essentially, explore to reduce the entropy&lt;/code&gt;!&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\epsilon\)&lt;/span&gt;-greedy: While commiting to the current best solution most of the time; we should set aside a small budget for random exploration, say for 5% of the time serving a &lt;strong&gt;not-the-current-best&lt;/strong&gt; solution&lt;/li&gt;
+&lt;li&gt;Upper confidence bound (UCB): Explore an option proportionally to how much we know about its performance. Intuitively, the less we know about an option, the higher potential value it can bring (to our surprise); so we should try it more. Reversely, as we know more about an option, we may reduce its frequency. &lt;strong&gt;Essentially, explore to reduce the entropy!&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h1 id="references"&gt;References&lt;/h1&gt;
 &lt;ol&gt;
