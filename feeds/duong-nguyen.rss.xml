@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Sun, 14 Feb 2021 00:00:00 +0900</lastBuildDate><item><title>An opinionated case against A/B testing: Exploration-vs-Exploitation</title><link>/an-opinionated-case-against-ab-testing-exploration-vs-exploitation.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
+<rss version="2.0"><channel><title>Random Notes - Duong Nguyen</title><link>/</link><description></description><lastBuildDate>Sun, 28 Feb 2021 00:00:00 +0900</lastBuildDate><item><title>Solving linear equations in modulo world</title><link>/solving-linear-equations-in-modulo-world.html</link><description>&lt;h1 id="welcome-to-the-modulo-world"&gt;Welcome to the modulo world&lt;/h1&gt;
+&lt;p&gt;Modulo (aka mod) is an important operation in number theory. Given a positive integer &lt;span class="math"&gt;\(m\)&lt;/span&gt; as modulo, an arbitrary integer is &lt;em&gt;mapped&lt;/em&gt; into a number in &lt;span class="math"&gt;\(\mathcal{M} = \{0,1,...m-1\}\)&lt;/span&gt; via modulo operation, &lt;code&gt;a -&amp;gt; a % m&lt;/code&gt; &lt;span class="math"&gt;\(\in \mathcal{M}\)&lt;/span&gt;. More importantly, common arithmetic operations …&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Sun, 28 Feb 2021 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2021-02-28:/solving-linear-equations-in-modulo-world.html</guid><category>Math</category><category>number theory</category><category>modulo</category><category>programming</category></item><item><title>An opinionated case against A/B testing: Exploration-vs-Exploitation</title><link>/an-opinionated-case-against-ab-testing-exploration-vs-exploitation.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Nowadays, a lot of companies (esp. tech companies) have been embracing data-driven decision making practice. Almost every business decision such as &lt;em&gt;what background color should be used for the company website&lt;/em&gt; or &lt;em&gt;whether a new kitty photo filter should be released&lt;/em&gt; requires justification with some experimental perf metrics. A …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Duong Nguyen</dc:creator><pubDate>Sun, 14 Feb 2021 00:00:00 +0900</pubDate><guid isPermaLink="false">tag:None,2021-02-14:/an-opinionated-case-against-ab-testing-exploration-vs-exploitation.html</guid><category>Decision Making</category><category>experiment</category><category>A/B test</category><category>multi-armed bandits</category><category>exploration</category><category>exploitation</category></item><item><title>Bellman-Ford and systems of difference constraints</title><link>/bellman-ford-and-systems-of-difference-constraints.html</link><description>&lt;h1 id="motivation"&gt;Motivation&lt;/h1&gt;
 &lt;p&gt;Bellman-Ford is an algorithm for finding shortest paths from a single source vertex to multiple target vertices in a weighted graph &lt;span class="math"&gt;\(G(V,E)\)&lt;/span&gt; whose edge weights can be negative. The algorithm can also detect negative cycle (if any) in the graph. Its time complexity is &lt;span class="math"&gt;\(O(|V|*|E …&lt;/span&gt;&lt;/p&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
